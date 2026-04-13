@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Seoul Bite</title>
+    <!-- CSS files -->
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/checkout.css">
+</head>
+<body>
+    <!-- Skip link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="brand">
+                <img src="../Assets/logo.svg" alt="Seoul Bite Logo" id="logo">
+                <span class="brand-name">Seoul Bite</span>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="products.html">Menu</a></li>
+                    <li><a href="cart.html">Cart</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="checkout-container">
+        <div class="page-header">
+            <h1>Checkout</h1>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="checkout-section">
+            <h3>Order Summary</h3>
+            <div id="order-items"></div>
+            <div class="summary-row total" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e8ddd5;">
+                <span>Total to Pay</span>
+                <span id="order-total">J$0</span>
+            </div>
+        </div>
+
+        <!-- Checkout Form -->
+        <form id="checkout-form" novalidate>
+            <!-- Shipping Details -->
+            <div class="checkout-section">
+                <h3>Shipping Details</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" required>
+                        <div class="error-message" id="fullName-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" required>
+                        <div class="error-message" id="phone-error"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="address">Delivery Address *</label>
+                    <textarea id="address" rows="3" required></textarea>
+                    <div class="error-message" id="address-error"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="parish">Parish *</label>
+                        <select id="parish" required>
+                            <option value="">Select Parish</option>
+                            <option value="Kingston">Kingston</option>
+                            <option value="St. Andrew">St. Andrew</option>
+                            <option value="St. Catherine">St. Catherine</option>
+                            <option value="Clarendon">Clarendon</option>
+                            <option value="Manchester">Manchester</option>
+                            <option value="St. Elizabeth">St. Elizabeth</option>
+                            <option value="Westmoreland">Westmoreland</option>
+                            <option value="Hanover">Hanover</option>
+                            <option value="St. James">St. James</option>
+                            <option value="Trelawny">Trelawny</option>
+                            <option value="St. Ann">St. Ann</option>
+                            <option value="St. Mary">St. Mary</option>
+                            <option value="Portland">Portland</option>
+                            <option value="St. Thomas">St. Thomas</option>
+                        </select>
+                        <div class="error-message" id="parish-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="instructions">Delivery Instructions (Optional)</label>
+                        <input type="text" id="instructions" placeholder="e.g., Gate code, landmarks">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="checkout-section">
+                <h3>Payment Method</h3>
+                <div class="payment-options">
+                    <label class="payment-option selected">
+                        <input type="radio" name="payment" value="cod" checked>
+                        <span>Cash on Delivery</span>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="card">
+                        <span>Credit/Debit Card</span>
+                    </label>
+                </div>
+
+                <!-- Card Details (Hidden by default) -->
+                <div id="card-details" class="hidden" style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cardNumber">Card Number *</label>
+                            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                            <div class="error-message" id="cardNumber-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cardName">Cardholder Name *</label>
+                            <input type="text" id="cardName" placeholder="Name on card">
+                            <div class="error-message" id="cardName-error"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expiry">Expiry Date *</label>
+                            <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+                            <div class="error-message" id="expiry-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV *</label>
+                            <input type="text" id="cvv" placeholder="123" maxlength="4">
+                            <div class="error-message" id="cvv-error"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="cart-actions">
+                <a href="cart.html" class="btn btn-secondary">Back to Cart</a>
+                <button type="submit" class="btn btn-gold">Place Order</button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Order Confirmation Modal -->
+    <div class="modal-overlay" id="confirmation-modal">
+        <div class="modal" style="text-align: center;">
+            <h2 style="color: #2e7d32;">Order Confirmed!</h2>
+            <p style="margin: 20px 0; color: #5a3535;">Thank you for your order.</p>
+            <p style="color: #5a3535;">Order Number: <strong id="order-number" style="color: #800020;"></strong></p>
+            <p style="margin-top: 20px; color: #5a3535;">We'll deliver your food soon!</p>
+            <button class="btn btn-primary" id="done-btn" style="margin-top: 20px;">Continue Shopping</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Seoul Bite. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Toast -->
+    <div id="toast" role="alert"></div>
+
+    <!-- JavaScript -->
+    <script src="../js/common.js"></script>
+    <script src="../js/checkout.js"></script>
+</body>
+</html>

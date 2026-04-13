@@ -1,0 +1,79 @@
+/*
+   LOGIN.CSS - Login Page Styles
+   Developer: Dominic Appleton | ID: 2102508
+*/
+
+/* Auth page uses flexbox to center the form vertically and horizontally */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Auth container - the login form card */
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 10px 35px rgba(61, 10, 20, 0.18);
+    animation: fadeIn 0.7s ease-out;
+    border-top: 4px solid #800020;
+}
+
+/* Fade in animation for the card */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-25px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Shake animation for a failed login attempt */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Form title */
+.auth-container h2 {
+    color: #800020;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e8ddd5;
+}
+
+/* Brand name on auth pages */
+.auth-container .brand-name {
+    color: #800020;
+}
+
+/* Auth footer with register/login link */
+.auth-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e8ddd5;
+    color: #5a3535;
+}
+
+.auth-footer a {
+    color: #800020;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .auth-container { padding: 24px; }
+}

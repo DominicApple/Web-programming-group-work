@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - Seoul Bite</title>
+    <!-- CSS files -->
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/cart.css">
+</head>
+<body>
+    <!-- Skip link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="brand">
+                <img src="../Assets/logo.svg" alt="Seoul Bite Logo" id="logo">
+                <span class="brand-name">Seoul Bite</span>
+            </a>
+            <button class="menu-toggle" id="menu-toggle">☰</button>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="products.html">Menu</a></li>
+                    <li><a href="cart.html" class="active">Cart (<span id="cart-count">0</span>)</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="#" id="auth-link">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="cart-container">
+        <div class="page-header">
+            <h1>Shopping Cart</h1>
+        </div>
+
+        <!-- Empty Cart Message -->
+        <div class="cart-empty hidden" id="empty-cart">
+            <h2>Your cart is empty</h2>
+            <p style="margin: 20px 0;">Looks like you haven't added any items yet.</p>
+            <a href="products.html" class="btn btn-primary">Browse Menu</a>
+        </div>
+
+        <!-- Cart Content -->
+        <div id="cart-content">
+            <!-- Cart Items -->
+            <div class="cart-items" id="cart-items">
+                <!-- Items rendered by JavaScript -->
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="cart-summary">
+                <h3>Order Summary</h3>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal">J$0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Discount (10%)</span>
+                    <span id="discount">-J$0</span>
+                </div>
+                <div class="summary-row">
+                    <span>GCT (15%)</span>
+                    <span id="tax">J$0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery Fee</span>
+                    <span id="delivery-fee">J$500</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span id="total">J$0</span>
+                </div>
+
+                <p style="color: #8a6a6a; font-size: 14px; margin-top: 15px;">
+                    * Free delivery for orders over J$5,000
+                </p>
+
+                <div class="cart-actions">
+                    <button class="btn btn-danger" id="clear-cart-btn">Clear Cart</button>
+                    <button class="btn btn-gold" id="checkout-btn">Checkout</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal">
+            <h2 id="modal-title">Confirm Action</h2>
+            <p id="modal-message">Are you sure?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+                <button class="btn btn-danger" id="modal-confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Seoul Bite. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Toast -->
+    <div id="toast" role="alert"></div>
+
+    <!-- JavaScript -->
+    <script src="../js/common.js"></script>
+    <script src="../js/cart.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Seoul Bite</title>
+    <!-- CSS files -->
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/register.css">
+</head>
+<body class="auth-page">
+    <!-- Skip link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <main id="main-content" class="auth-container">
+        <!-- Logo and brand -->
+        <div class="text-center mb-3">
+            <img src="../Assets/logo.svg" alt="Seoul Bite Logo" id="logo" style="width: 80px;">
+            <h1 class="brand-name">Seoul Bite</h1>
+        </div>
+
+        <h2>Create Account</h2>
+
+        <!-- Registration Form -->
+        <form id="register-form" novalidate>
+            <!-- Full Name and Email row -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" placeholder="Enter your full name" required>
+                    <div class="error-message" id="fullName-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                    <div class="error-message" id="email-error"></div>
+                </div>
+            </div>
+
+            <!-- Date of Birth and Phone row -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dob">Date of Birth *</label>
+                    <input type="date" id="dob" required>
+                    <div class="error-message" id="dob-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                    <div class="error-message" id="phone-error"></div>
+                </div>
+            </div>
+
+            <!-- Username -->
+            <div class="form-group">
+                <label for="username">Username *</label>
+                <input type="text" id="username" placeholder="Choose a username" required>
+                <div class="error-message" id="username-error"></div>
+            </div>
+
+            <!-- Password row -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" id="password" placeholder="Min 8 characters" required>
+                    <div class="error-message" id="password-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password *</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm password" required>
+                    <div class="error-message" id="confirmPassword-error"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="index.html">Login here</a></p>
+        </div>
+    </main>
+
+    <!-- Toast notification -->
+    <div id="toast" role="alert"></div>
+
+    <!-- JavaScript files -->
+    <script src="../js/common.js"></script>
+    <script src="../js/register.js"></script>
+</body>
+</html>

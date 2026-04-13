@@ -1,0 +1,728 @@
+/*
+   ================================================================
+   COMMON.CSS - Shared Styles
+   ================================================================
+   This file contains styles used across all pages:
+   - CSS Variables (custom properties)
+   - Reset styles
+   - Header and navigation
+   - Buttons
+   - Forms
+   - Footer
+   - Toast notifications
+   - Modal dialogs
+   - Page transitions
+   - Responsive design
+
+   Developer: Dominic Appleton
+   Student ID: 2102508
+   ================================================================
+*/
+
+
+/* ================================================================
+   CSS VARIABLES (Custom Properties)
+   ================================================================
+   Variables store reusable values that can be used throughout CSS.
+   This ensures consistency and makes it easy to change colors/sizes.
+
+   Color Theme: Beige / White / Burgundy
+   To use a variable: var(--variable-name)
+   ================================================================ */
+:root {
+    /* Color palette - Beige / White / Burgundy theme */
+    --primary-bg: #f5f0e8;          /* Warm beige main background */
+    --primary-dark: #3d0a14;        /* Deep wine/burgundy for header & footer */
+    --burgundy: #800020;            /* Main burgundy accent */
+    --burgundy-dark: #5c0015;       /* Darker burgundy for active/pressed states */
+    --burgundy-light: #a03040;      /* Lighter burgundy for hover states */
+    --cream: #fff8f0;               /* Warm cream for card backgrounds */
+    --white: #ffffff;               /* Pure white */
+    --off-white: #f9f5ee;           /* Slightly warm off-white */
+    --text-primary: #2d1010;        /* Near-black text on light backgrounds */
+    --text-secondary: #5a3535;      /* Medium-dark text for secondary content */
+    --text-muted: #8a6a6a;          /* Muted text (captions, placeholders) */
+    --gray-light: #e8ddd5;          /* Light warm gray for borders */
+    --gray: #b8a8a0;                /* Medium warm gray */
+    --gray-dark: #7a6060;           /* Darker warm gray */
+    --card-bg: #ffffff;             /* White card backgrounds */
+    --card-border: #e8ddd5;         /* Subtle card border */
+
+    /* Typography */
+    --font-primary: 'Arial', 'Helvetica Neue', sans-serif;
+
+    /* Spacing */
+    --spacing-xs: 5px;
+    --spacing-sm: 10px;
+    --spacing-md: 15px;
+    --spacing-lg: 20px;
+    --spacing-xl: 40px;
+
+    /* Border radius */
+    --radius-sm: 5px;
+    --radius-md: 10px;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 6px rgba(61, 10, 20, 0.1);
+    --shadow-md: 0 4px 14px rgba(61, 10, 20, 0.15);
+    --shadow-lg: 0 10px 35px rgba(61, 10, 20, 0.2);
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.35s ease;
+    --transition-slow: 0.5s ease;
+}
+
+
+/* ================================================================
+   PAGE TRANSITION - Fade & Slide In on Load
+   ================================================================
+   Gives every page a smooth entrance animation so that navigation
+   feels polished rather than jarring.
+   ================================================================ */
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Page exit — added by JS before following a link */
+@keyframes pageExit {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+}
+
+body {
+    animation: pageEnter var(--transition-slow) ease-out both;
+}
+
+body.page-exit {
+    animation: pageExit 0.3s ease-in both;
+    pointer-events: none;   /* Prevent accidental double-clicks during exit */
+}
+
+
+/* ================================================================
+   UNIVERSAL SELECTOR (*)
+   ================================================================
+   The * selector targets ALL elements on the page.
+   This resets default browser styles for consistency.
+   ================================================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;  /* Makes width/height include padding and border */
+}
+
+
+/* ================================================================
+   HTML ELEMENT SELECTOR
+   ================================================================
+   Element selectors target HTML tags directly.
+   ================================================================ */
+html {
+    scroll-behavior: smooth;  /* Smooth scrolling for anchor links */
+}
+
+
+/* ================================================================
+   BODY ELEMENT SELECTOR
+   ================================================================
+   Sets default styles for the entire page.
+   Beige gradient background for a warm, welcoming feel.
+   ================================================================ */
+body {
+    font-family: var(--font-primary);
+    font-size: 16px;
+    background: linear-gradient(150deg, var(--primary-bg) 0%, var(--off-white) 100%);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+
+/* ================================================================
+   CLASS SELECTOR (.skip-link)
+   ================================================================
+   Class selectors target elements with a specific class attribute.
+   The skip link helps keyboard users navigate past the header.
+   ================================================================ */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--burgundy);
+    color: var(--white);
+    padding: var(--spacing-sm) var(--spacing-md);
+    z-index: 9999;
+    transition: top var(--transition-fast);
+}
+
+/* PSEUDO-CLASS SELECTOR (:focus) */
+/* Pseudo-classes target elements in a specific state */
+.skip-link:focus {
+    top: 0;  /* Shows skip link when focused */
+}
+
+
+/* ================================================================
+   HEADER ELEMENT SELECTOR
+   ================================================================
+   Deep wine background keeps the header visually distinct from
+   the light beige content area.
+   ================================================================ */
+header {
+    background-color: var(--primary-dark);
+    padding: var(--spacing-md) var(--spacing-lg);
+    position: sticky;  /* Stays at top when scrolling */
+    top: 0;
+    z-index: 1000;
+    box-shadow: var(--shadow-md);
+    border-bottom: 3px solid var(--burgundy);
+}
+
+
+/* ================================================================
+   NAVIGATION CONTAINER (Flexbox Layout)
+   ================================================================
+   Flexbox is used to arrange items in a row.
+   justify-content: space-between puts space between items.
+   ================================================================ */
+.nav-container {
+    display: flex;  /* Enables flexbox layout */
+    justify-content: space-between;  /* Items at left and right */
+    align-items: center;  /* Vertically center items */
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+
+/* ================================================================
+   BRAND LOGO SECTION (Flexbox)
+   ================================================================ */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);  /* Space between logo and text */
+    text-decoration: none;
+}
+
+/* ID SELECTOR (#logo) */
+/* ID selectors target a single unique element */
+#logo {
+    width: 60px;
+    height: auto;
+    border-radius: 50%;  /* Makes it circular */
+    transition: transform var(--transition-normal);
+    border: 2px solid var(--burgundy-light);
+}
+
+/* PSEUDO-CLASS: Hover state for logo */
+#logo:hover {
+    transform: scale(1.1);  /* Slightly enlarge on hover */
+}
+
+.brand-name {
+    color: var(--cream);
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+
+/* ================================================================
+   NAVIGATION MENU (Flexbox)
+   ================================================================ */
+nav ul {
+    display: flex;
+    list-style: none;  /* Remove bullet points */
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+/* DESCENDANT SELECTOR (nav ul li a) */
+/* Targets <a> tags inside <li> inside <ul> inside <nav> */
+nav ul li a {
+    color: var(--gray-light);
+    text-decoration: none;
+    font-size: 16px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-normal);
+    position: relative;
+}
+
+/* PSEUDO-CLASS: Hover state for nav links */
+nav ul li a:hover {
+    color: var(--cream);
+    background-color: rgba(128, 0, 32, 0.4);
+}
+
+/* PSEUDO-ELEMENT (::after) for active link underline */
+nav ul li a.active {
+    color: var(--cream);
+}
+
+nav ul li a.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background-color: var(--cream);
+    border-radius: 2px;
+}
+
+
+/* ================================================================
+   MOBILE MENU TOGGLE BUTTON
+   ================================================================ */
+.menu-toggle {
+    display: none;  /* Hidden on desktop */
+    background: none;
+    border: none;
+    color: var(--cream);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+
+/* ================================================================
+   CONTAINER CLASS
+   ================================================================
+   Centers content with maximum width.
+   ================================================================ */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+
+
+/* ================================================================
+   PAGE HEADER SECTION
+   ================================================================ */
+.page-header {
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+}
+
+.page-header h1 {
+    color: var(--burgundy);
+    font-size: 36px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.page-header p {
+    color: var(--text-secondary);
+    font-size: 18px;
+}
+
+
+/* ================================================================
+   CARD COMPONENT
+   ================================================================
+   Reusable styled container for content.
+   White cards on beige background create clear visual hierarchy.
+   ================================================================ */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-lg);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+
+/* ================================================================
+   BUTTON STYLES
+   ================================================================
+   Base button class with modifier classes for different styles.
+   ================================================================ */
+.btn {
+    display: inline-block;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all var(--transition-normal);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Primary button - burgundy fill */
+.btn-primary {
+    background: linear-gradient(135deg, var(--burgundy), var(--burgundy-dark));
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--burgundy-light), var(--burgundy));
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* Secondary button - outlined burgundy */
+.btn-secondary {
+    background: transparent;
+    color: var(--burgundy);
+    border: 2px solid var(--burgundy);
+}
+
+.btn-secondary:hover {
+    background: var(--burgundy);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+/* Gold button - warm cream/amber (used for checkout CTA) */
+.btn-gold {
+    background: linear-gradient(135deg, #b8860b, #d4a017);
+    color: var(--white);
+}
+
+.btn-gold:hover {
+    box-shadow: 0 0 20px rgba(184, 134, 11, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Danger button - for destructive actions */
+.btn-danger {
+    background: #b00020;
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background: #d00028;
+    transform: translateY(-2px);
+}
+
+/* Button size modifiers */
+.btn-sm {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 14px;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+
+/* ================================================================
+   FORM ELEMENTS
+   ================================================================ */
+
+/* Label styling */
+label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+    font-weight: bold;
+}
+
+/* ATTRIBUTE SELECTOR [type="text"] */
+/* Targets input elements with specific type attribute */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    width: 100%;
+    padding: var(--spacing-md);
+    margin: var(--spacing-sm) 0 var(--spacing-lg);
+    background-color: var(--white);
+    border: 1px solid var(--gray-light);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-family: var(--font-primary);
+    transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+/* PSEUDO-CLASS: Focus state for inputs */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--burgundy);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(128, 0, 32, 0.12);
+}
+
+/* PSEUDO-ELEMENT: Placeholder text styling */
+input::placeholder,
+textarea::placeholder {
+    color: var(--gray);
+}
+
+/* Error message styling */
+.error-message {
+    color: #b00020;
+    font-size: 14px;
+    margin-top: -10px;
+    margin-bottom: var(--spacing-sm);
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+/* Input error state */
+.input-error {
+    border-color: #b00020 !important;
+}
+
+/* Form group container */
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+/* Two-column form row (CSS Grid) */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* Two equal columns */
+    gap: var(--spacing-lg);
+}
+
+
+/* ================================================================
+   FOOTER (CSS Grid)
+   ================================================================
+   Dark wine background echoes the header for visual bookending.
+   ================================================================ */
+footer {
+    background-color: var(--primary-dark);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    margin-top: auto;
+    border-top: 3px solid var(--burgundy);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-xl);
+}
+
+.footer-section h4 {
+    color: var(--cream);
+    margin-bottom: var(--spacing-md);
+    font-size: 18px;
+}
+
+.footer-section p,
+.footer-section a {
+    color: var(--gray-light);
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.footer-section a {
+    display: block;
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.footer-section a:hover {
+    color: var(--cream);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+    border-top: 1px solid rgba(232, 221, 213, 0.2);
+    color: var(--gray);
+    font-size: 14px;
+}
+
+
+/* ================================================================
+   TOAST NOTIFICATION
+   ================================================================ */
+#toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--white);
+    color: var(--text-primary);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    border-left: 4px solid var(--burgundy);
+    transform: translateX(150%);  /* Hidden off-screen */
+    transition: transform var(--transition-normal);
+    z-index: 9999;
+}
+
+#toast.show {
+    transform: translateX(0);  /* Slides in when shown */
+}
+
+#toast.success {
+    border-left-color: #2e7d32;
+}
+
+#toast.error {
+    border-left-color: #b00020;
+}
+
+
+/* ================================================================
+   MODAL DIALOG
+   ================================================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(61, 10, 20, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background-color: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-md);
+    max-width: 500px;
+    width: 90%;
+    transform: scale(0.85);
+    transition: transform var(--transition-normal);
+    border-top: 4px solid var(--burgundy);
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-overlay.show .modal {
+    transform: scale(1);
+}
+
+.modal h2 {
+    color: var(--burgundy);
+    margin-bottom: var(--spacing-lg);
+}
+
+.modal p {
+    color: var(--text-secondary);
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    margin-top: var(--spacing-lg);
+}
+
+
+/* ================================================================
+   UTILITY CLASSES
+   ================================================================ */
+.text-center { text-align: center; }
+.text-burgundy { color: var(--burgundy); }
+.hidden { display: none !important; }
+.mt-1 { margin-top: var(--spacing-sm); }
+.mt-2 { margin-top: var(--spacing-md); }
+.mt-3 { margin-top: var(--spacing-lg); }
+.mb-1 { margin-bottom: var(--spacing-sm); }
+.mb-2 { margin-bottom: var(--spacing-md); }
+.mb-3 { margin-bottom: var(--spacing-lg); }
+
+
+/* ================================================================
+   RESPONSIVE DESIGN - MEDIA QUERIES
+   ================================================================
+   Media queries apply styles only at certain screen sizes.
+   ================================================================ */
+
+/* Tablet and below (max-width: 950px) */
+@media (max-width: 950px) {
+    .nav-container {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    nav ul {
+        gap: var(--spacing-sm);
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;  /* Single column on smaller screens */
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+}
+
+/* Mobile (max-width: 600px) */
+@media (max-width: 600px) {
+    .menu-toggle {
+        display: block;  /* Show hamburger menu */
+    }
+
+    nav ul {
+        display: none;  /* Hide menu by default */
+        flex-direction: column;
+        width: 100%;
+        text-align: center;
+        padding: var(--spacing-md) 0;
+    }
+
+    nav ul.show {
+        display: flex;  /* Show when toggle clicked */
+    }
+
+    .brand-name {
+        font-size: 18px;
+    }
+
+    .page-header h1 {
+        font-size: 28px;
+    }
+}

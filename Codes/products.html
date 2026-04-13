@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Seoul Bite</title>
+    <!-- CSS files -->
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/products.css">
+</head>
+<body>
+    <!-- Skip link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header with Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="brand">
+                <img src="../Assets/logo.svg" alt="Seoul Bite Logo" id="logo">
+                <span class="brand-name">Seoul Bite</span>
+            </a>
+            <button class="menu-toggle" id="menu-toggle">☰</button>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="products.html" class="active">Menu</a></li>
+                    <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="#" id="auth-link">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="container">
+        <div class="page-header">
+            <h1>Our Menu</h1>
+            <p>Authentic Korean Flavors</p>
+        </div>
+
+        <!-- Category Filter Buttons -->
+        <div class="category-filters">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="main">Main Dishes</button>
+            <button class="filter-btn" data-category="appetizer">Appetizers</button>
+            <button class="filter-btn" data-category="soup">Soups</button>
+            <button class="filter-btn" data-category="side">Sides</button>
+            <button class="filter-btn" data-category="drink">Drinks</button>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="products-grid">
+            <!-- Products will be rendered by JavaScript -->
+        </div>
+
+        <!-- No Products Message -->
+        <div class="text-center hidden" id="no-products">
+            <p style="padding: 40px; color: #5a3535;">No products found in this category.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Seoul Bite</h4>
+                <p>Authentic Korean Ghost Kitchen</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="products.html">Menu</a>
+                <a href="cart.html">Cart</a>
+                <a href="about.html">About Us</a>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>Phone: (876) 555-0123</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Seoul Bite. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Toast notification -->
+    <div id="toast" role="alert"></div>
+
+    <!-- JavaScript files -->
+    <script src="../js/common.js"></script>
+    <script src="../js/products.js"></script>
+</body>
+</html>

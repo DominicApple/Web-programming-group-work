@@ -1,0 +1,96 @@
+/*
+   CHECKOUT.CSS - Checkout Page Styles
+   Developer: Dominic Appleton | ID: 2102508
+*/
+
+.checkout-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* White section cards on the beige page background */
+.checkout-section {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #e8ddd5;
+}
+
+/* Section headings in burgundy with warm-gray underline */
+.checkout-section h3 {
+    color: #800020;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e8ddd5;
+    font-size: 20px;
+}
+
+/* Order item row */
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e8ddd5;
+    color: #5a3535;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+/* Address textarea override to match theme */
+.checkout-container textarea {
+    width: 100%;
+    padding: 15px;
+    background: #ffffff;
+    border: 1px solid #e8ddd5;
+    color: #2d1010;
+    border-radius: 5px;
+}
+
+.checkout-container textarea:focus {
+    border-color: #800020;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(128, 0, 32, 0.1);
+}
+
+/* Payment options - CSS Grid */
+.payment-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Payment option card */
+.payment-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    border: 2px solid #e8ddd5;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #5a3535;
+    transition: all 0.3s ease;
+}
+
+.payment-option:hover,
+.payment-option.selected {
+    border-color: #800020;
+    background-color: rgba(128, 0, 32, 0.06);
+    color: #800020;
+}
+
+/* Radio button matches burgundy theme */
+.payment-option input[type="radio"] {
+    accent-color: #800020;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .checkout-section { padding: 20px; }
+    .payment-options { grid-template-columns: 1fr; }
+}
