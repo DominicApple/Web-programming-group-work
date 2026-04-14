@@ -6,9 +6,10 @@
    - Registration form validation
    - Email format validation using regex
    - Password matching validation
-   - Age calculation from date of birth
-   - Creating new user accounts
-   
+   - Age calculation from date of birth (must be 18+)
+   - TRN format and uniqueness validation (000-000-000)
+   - Creating new user accounts stored in RegistrationData
+
    Developer: Dominic Appleton
    Student ID: 2102508
    ================================================================
@@ -25,13 +26,18 @@
 var form = document.getElementById('register-form');
 
 // Get references to all input fields
-var fullName = document.getElementById('fullName');
-var email = document.getElementById('email');
-var dob = document.getElementById('dob');
-var phone = document.getElementById('phone');
-var username = document.getElementById('username');
-var password = document.getElementById('password');
+var firstName       = document.getElementById('firstName');
+var lastName        = document.getElementById('lastName');
+var email           = document.getElementById('email');
+var dob             = document.getElementById('dob');
+var gender          = document.getElementById('gender');
+var phone           = document.getElementById('phone');
+var trn             = document.getElementById('trn');
+var password        = document.getElementById('password');
 var confirmPassword = document.getElementById('confirmPassword');
+
+// Cancel button reference
+var cancelBtn = document.getElementById('cancel-btn');
 
 
 /* ================================================================
@@ -43,14 +49,29 @@ var confirmPassword = document.getElementById('confirmPassword');
 form.addEventListener('submit', function(e) {
     // Prevent default form submission (page reload)
     e.preventDefault();
-    
+
     // Clear any previous errors
     clearErrors();
-    
+
     // Validate form - if valid, register the user
     if (validateForm()) {
         registerUser();
     }
+});
+
+
+/* ================================================================
+   EVENT HANDLING: Cancel Button
+   ================================================================
+   Question 1a (viii): Cancel button clears all data from the
+   registration form.
+   ================================================================ */
+cancelBtn.addEventListener('click', function() {
+    // Reset all form fields to blank/default
+    form.reset();
+
+    // Clear all error messages too
+    clearErrors();
 });
 
 
@@ -60,27 +81,30 @@ form.addEventListener('submit', function(e) {
    'blur' event fires when user leaves a field.
    This provides immediate feedback as user fills out form.
    ================================================================ */
-
-// Validate full name when user leaves field
-fullName.addEventListener('blur', validateFullName);
-
-// Validate email when user leaves field
-email.addEventListener('blur', validateEmail);
-
-// Validate date of birth when user leaves field
-dob.addEventListener('blur', validateDOB);
-
-// Validate phone when user leaves field
-phone.addEventListener('blur', validatePhone);
-
-// Validate username when user leaves field
-username.addEventListener('blur', validateUsername);
-
-// Validate password when user leaves field
-password.addEventListener('blur', validatePassword);
-
-// Validate confirm password when user leaves field
+firstName.addEventListener('blur',       validateFirstName);
+lastName.addEventListener('blur',        validateLastName);
+email.addEventListener('blur',           validateEmail);
+dob.addEventListener('blur',             validateDOB);
+gender.addEventListener('blur',          validateGender);
+phone.addEventListener('blur',           validatePhone);
+trn.addEventListener('blur',             validateTRN);
+password.addEventListener('blur',        validatePassword);
 confirmPassword.addEventListener('blur', validateConfirmPassword);
+
+/* Auto-format TRN as user types (inserts dashes at positions 3 and 7) */
+trn.addEventListener('input', function() {
+    // Strip everything that is not a digit
+    var digits = this.value.replace(/\D/g, '');
+
+    // Rebuild with dashes: 000-000-000
+    if (digits.length > 6) {
+        this.value = digits.substring(0,3) + '-' + digits.substring(3,6) + '-' + digits.substring(6,9);
+    } else if (digits.length > 3) {
+        this.value = digits.substring(0,3) + '-' + digits.substring(3,6);
+    } else {
+        this.value = digits;
+    }
+});
 
 
 /* ================================================================
@@ -91,45 +115,65 @@ confirmPassword.addEventListener('blur', validateConfirmPassword);
    ================================================================ */
 function validateForm() {
     var isValid = true;
-    
-    // Call each validation function
-    // If any returns false, form is invalid
-    if (!validateFullName()) isValid = false;
-    if (!validateEmail()) isValid = false;
-    if (!validateDOB()) isValid = false;
-    if (!validatePhone()) isValid = false;
-    if (!validateUsername()) isValid = false;
-    if (!validatePassword()) isValid = false;
+
+    if (!validateFirstName())       isValid = false;
+    if (!validateLastName())        isValid = false;
+    if (!validateEmail())           isValid = false;
+    if (!validateDOB())             isValid = false;
+    if (!validateGender())          isValid = false;
+    if (!validatePhone())           isValid = false;
+    if (!validateTRN())             isValid = false;
+    if (!validatePassword())        isValid = false;
     if (!validateConfirmPassword()) isValid = false;
-    
+
     return isValid;
 }
 
 
 /* ================================================================
-   FORM VALIDATION: Full Name
+   FORM VALIDATION: First Name
    ================================================================
    Rules:
    - Cannot be empty
    - Must be at least 2 characters
    ================================================================ */
-function validateFullName() {
-    // Get value and remove extra spaces
-    var value = fullName.value.trim();
-    
-    // VALIDATION: Check if empty
+function validateFirstName() {
+    var value = firstName.value.trim();
+
     if (value === '') {
-        showError('fullName', 'Full name is required');
+        showError('firstName', 'First name is required');
         return false;
     }
-    
-    // VALIDATION: Check minimum length
     if (value.length < 2) {
-        showError('fullName', 'Name must be at least 2 characters');
+        showError('firstName', 'First name must be at least 2 characters');
         return false;
     }
-    
-    hideError('fullName');
+
+    hideError('firstName');
+    return true;
+}
+
+
+/* ================================================================
+   FORM VALIDATION: Last Name
+   ================================================================
+   Rules:
+   - Cannot be empty
+   - Must be at least 2 characters
+   ================================================================ */
+function validateLastName() {
+    var value = lastName.value.trim();
+
+    if (value === '') {
+        showError('lastName', 'Last name is required');
+        return false;
+    }
+    if (value.length < 2) {
+        showError('lastName', 'Last name must be at least 2 characters');
+        return false;
+    }
+
+    hideError('lastName');
     return true;
 }
 
@@ -139,36 +183,22 @@ function validateFullName() {
    ================================================================
    Rules:
    - Cannot be empty
-   - Must match email format (using Regular Expression)
-   
-   REGEX PATTERN: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-   Explanation:
-   - ^        = Start of string
-   - [^\s@]+  = One or more characters that are NOT space or @
-   - @        = Literal @ symbol
-   - [^\s@]+  = One or more characters that are NOT space or @
-   - \.       = Literal dot (period)
-   - [^\s@]+  = One or more characters that are NOT space or @
-   - $        = End of string
+   - Must match email format (Regular Expression)
    ================================================================ */
 function validateEmail() {
     var value = email.value.trim();
-    
-    // VALIDATION: Check if empty
+
     if (value === '') {
         showError('email', 'Email is required');
         return false;
     }
-    
-    // VALIDATION: Check format using Regular Expression
+
     var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
-    // test() returns true if value matches pattern
     if (!emailRegex.test(value)) {
         showError('email', 'Please enter a valid email address');
         return false;
     }
-    
+
     hideError('email');
     return true;
 }
@@ -179,51 +209,59 @@ function validateEmail() {
    ================================================================
    Rules:
    - Cannot be empty
-   - User must be at least 13 years old
-   
-   This demonstrates ARITHMETIC (age calculation).
+   - Visitor must be OVER 18 years old (Question 1a iv)
+
+   AGE CALCULATION (ARITHMETIC):
+   - Subtract birth year from current year
+   - Adjust if birthday hasn't occurred yet this year
    ================================================================ */
 function validateDOB() {
-    // VALIDATION: Check if empty
+    // Question 1a (iv): visitor must be over 18 to register.
+    // Calculate age using JavaScript.
+
     if (dob.value === '') {
         showError('dob', 'Date of birth is required');
         return false;
     }
-    
-    // Create Date objects for comparison
+
     var birthDate = new Date(dob.value);
-    var today = new Date();
-    
-    /* ============================================================
-       AGE CALCULATION (ARITHMETIC)
-       ============================================================
-       Step 1: Subtract birth year from current year
-       Step 2: Adjust if birthday hasn't occurred yet this year
-       ============================================================ */
-    
+    var today     = new Date();
+
     // ARITHMETIC: Subtraction to get base age
-    var age = today.getFullYear() - birthDate.getFullYear();
-    
-    // Get the month difference
-    var monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    // IF/ELSE: Adjust age if birthday hasn't occurred yet
-    if (monthDiff < 0) {
-        // Birthday month is later in the year
-        // ARITHMETIC: Subtraction (decrement age by 1)
-        age = age - 1;
-    } else if (monthDiff === 0 && today.getDate() < birthDate.getDate()) {
-        // Same month but day hasn't passed yet
+    var age       = today.getFullYear() - birthDate.getFullYear();
+    var monthDiff = today.getMonth()    - birthDate.getMonth();
+
+    // Adjust if birthday hasn't happened yet this year
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age = age - 1;
     }
-    
-    // VALIDATION: Check minimum age
-    if (age < 13) {
-        showError('dob', 'You must be at least 13 years old');
+
+    // Must be at least 18
+    if (age < 18) {
+        showError('dob', 'You must be at least 18 years old to register');
         return false;
     }
-    
+
     hideError('dob');
+    return true;
+}
+
+
+/* ================================================================
+   FORM VALIDATION: Gender
+   ================================================================
+   Rules:
+   - A gender option must be selected
+   ================================================================ */
+function validateGender() {
+    var value = gender.value;
+
+    if (value === '') {
+        showError('gender', 'Please select your gender');
+        return false;
+    }
+
+    hideError('gender');
     return true;
 }
 
@@ -237,64 +275,63 @@ function validateDOB() {
    ================================================================ */
 function validatePhone() {
     var value = phone.value.trim();
-    
-    // VALIDATION: Check if empty
+
     if (value === '') {
         showError('phone', 'Phone number is required');
         return false;
     }
-    
-    // Remove formatting characters (spaces, dashes, parentheses, plus)
-    // replace() with regex removes all these characters
+
     var cleanPhone = value.replace(/[\s\-\(\)\+]/g, '');
-    
-    // VALIDATION: Check if 7-15 digits
     if (!/^\d{7,15}$/.test(cleanPhone)) {
         showError('phone', 'Please enter a valid phone number');
         return false;
     }
-    
+
     hideError('phone');
     return true;
 }
 
 
 /* ================================================================
-   FORM VALIDATION: Username
+   FORM VALIDATION: TRN (Tax Registration Number)
    ================================================================
+   Question 1a (v): TRN is unique; must be of length and in the
+   format (000-000-000). TRN is used instead of username for login.
+
    Rules:
    - Cannot be empty
-   - Must be at least 3 characters
-   - Must not already exist (check localStorage)
+   - Must match format: exactly 3 digits, dash, 3 digits, dash, 3 digits
+   - Must not already exist in RegistrationData
    ================================================================ */
-function validateUsername() {
-    var value = username.value.trim();
-    
+function validateTRN() {
+    var value = trn.value.trim();
+
     // VALIDATION: Check if empty
     if (value === '') {
-        showError('username', 'Username is required');
+        showError('trn', 'TRN is required');
         return false;
     }
-    
-    // VALIDATION: Check minimum length
-    if (value.length < 3) {
-        showError('username', 'Username must be at least 3 characters');
+
+    // VALIDATION: Must match 000-000-000 format exactly
+    var trnRegex = /^\d{3}-\d{3}-\d{3}$/;
+    if (!trnRegex.test(value)) {
+        showError('trn', 'TRN must be in the format 000-000-000');
         return false;
     }
-    
-    // VALIDATION: Check if username already exists
-    var users = JSON.parse(localStorage.getItem('seoulBiteUsers')) || [];
-    
-    // FOR LOOP: Check each existing user
+
+    // VALIDATION: Check if TRN already exists in RegistrationData
+    // Question 1a (vi): data stored under localStorage key RegistrationData
+    var users = JSON.parse(localStorage.getItem('RegistrationData')) || [];
+
+    // FOR LOOP: Check each existing user for duplicate TRN
     for (var i = 0; i < users.length; i++) {
-        // Case-insensitive comparison using toLowerCase()
-        if (users[i].username.toLowerCase() === value.toLowerCase()) {
-            showError('username', 'Username already taken');
+        if (users[i].trn === value) {
+            showError('trn', 'This TRN is already registered');
             return false;
         }
     }
-    
-    hideError('username');
+
+    hideError('trn');
     return true;
 }
 
@@ -302,6 +339,8 @@ function validateUsername() {
 /* ================================================================
    FORM VALIDATION: Password
    ================================================================
+   Question 1a (iii): Passwords should be at least 8 characters.
+
    Rules:
    - Cannot be empty
    - Must be at least 8 characters
@@ -309,30 +348,25 @@ function validateUsername() {
    ================================================================ */
 function validatePassword() {
     var value = password.value;
-    
-    // VALIDATION: Check if empty
+
     if (value === '') {
         showError('password', 'Password is required');
         return false;
     }
-    
-    // VALIDATION: Check minimum length
+
+    // Question 1a (iii): at least 8 characters long
     if (value.length < 8) {
         showError('password', 'Password must be at least 8 characters');
         return false;
     }
-    
-    // VALIDATION: Check for letters and numbers
-    // /[a-zA-Z]/ matches any letter (upper or lowercase)
-    // /[0-9]/ matches any digit
+
     var hasLetters = /[a-zA-Z]/.test(value);
     var hasNumbers = /[0-9]/.test(value);
-    
     if (!hasLetters || !hasNumbers) {
         showError('password', 'Password must contain letters and numbers');
         return false;
     }
-    
+
     hideError('password');
     return true;
 }
@@ -346,18 +380,16 @@ function validatePassword() {
    - Must match the password field
    ================================================================ */
 function validateConfirmPassword() {
-    // VALIDATION: Check if empty
     if (confirmPassword.value === '') {
         showError('confirmPassword', 'Please confirm your password');
         return false;
     }
-    
-    // VALIDATION: Check if passwords match
+
     if (confirmPassword.value !== password.value) {
         showError('confirmPassword', 'Passwords do not match');
         return false;
     }
-    
+
     hideError('confirmPassword');
     return true;
 }
@@ -369,19 +401,13 @@ function validateConfirmPassword() {
    DOM MANIPULATION: Displays error message for a field.
    ================================================================ */
 function showError(fieldId, message) {
-    // Get the error element for this field
     var errorEl = document.getElementById(fieldId + '-error');
-    
-    // Get the input element
-    var input = document.getElementById(fieldId);
-    
-    // DOM MANIPULATION: Set error text and show it
+    var input   = document.getElementById(fieldId);
+
     if (errorEl) {
         errorEl.textContent = message;
         errorEl.classList.add('show');
     }
-    
-    // DOM MANIPULATION: Add error styling to input
     if (input) {
         input.classList.add('input-error');
     }
@@ -395,13 +421,12 @@ function showError(fieldId, message) {
    ================================================================ */
 function hideError(fieldId) {
     var errorEl = document.getElementById(fieldId + '-error');
-    var input = document.getElementById(fieldId);
-    
+    var input   = document.getElementById(fieldId);
+
     if (errorEl) {
         errorEl.textContent = '';
         errorEl.classList.remove('show');
     }
-    
     if (input) {
         input.classList.remove('input-error');
     }
@@ -414,8 +439,9 @@ function hideError(fieldId) {
    Clears all error messages on the form.
    ================================================================ */
 function clearErrors() {
-    var fields = ['fullName', 'email', 'dob', 'phone', 'username', 'password', 'confirmPassword'];
-    
+    var fields = ['firstName', 'lastName', 'email', 'dob', 'gender',
+                  'phone', 'trn', 'password', 'confirmPassword'];
+
     // FOR LOOP: Clear error for each field
     for (var i = 0; i < fields.length; i++) {
         hideError(fields[i]);
@@ -426,33 +452,42 @@ function clearErrors() {
 /* ================================================================
    REGISTER USER FUNCTION
    ================================================================
-   Creates new user account and saves to localStorage.
+   Question 1a (vi): Store registration information as a JavaScript
+   object. Each record is appended to localStorage key
+   'RegistrationData' as an array of objects.
+
+   Stored fields: firstName, lastName, dob, gender, phone, email,
+   trn, password, dateOfRegistration, cart{}, invoices[]
    ================================================================ */
 function registerUser() {
-    // Create user object with form data
+    // Question 1a (vi): Build user object with all required fields
     var newUser = {
-        id: 'USR' + Date.now(),
-        fullName: fullName.value.trim(),
-        email: email.value.trim(),
-        dob: dob.value,
-        phone: phone.value.trim(),
-        username: username.value.trim(),
-        password: password.value,
-        createdAt: new Date().toISOString()
+        id:                 'USR' + Date.now(),
+        firstName:          firstName.value.trim(),
+        lastName:           lastName.value.trim(),
+        dob:                dob.value,
+        gender:             gender.value,
+        phone:              phone.value.trim(),
+        email:              email.value.trim(),
+        trn:                trn.value.trim(),
+        password:           password.value,
+        dateOfRegistration: new Date().toISOString(),
+        cart:               {},      // Empty cart object (populated later)
+        invoices:           []       // Empty invoices array (populated later)
     };
-    
-    // Get existing users from localStorage (or empty array)
-    var users = JSON.parse(localStorage.getItem('seoulBiteUsers')) || [];
-    
-    // Add new user to array
+
+    // Retrieve existing users from RegistrationData (or start empty array)
+    var users = JSON.parse(localStorage.getItem('RegistrationData')) || [];
+
+    // Append new user to the array
     users.push(newUser);
-    
-    // Save updated array to localStorage
-    localStorage.setItem('seoulBiteUsers', JSON.stringify(users));
-    
+
+    // Save updated array back to localStorage under key 'RegistrationData'
+    localStorage.setItem('RegistrationData', JSON.stringify(users));
+
     // Show success message
     showToast('Registration successful! Please login.', 'success');
-    
+
     // Redirect to login page after 1.5 seconds
     setTimeout(function() {
         window.location.href = 'index.html';

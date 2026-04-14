@@ -63,6 +63,10 @@
     color: #5a3535;
 }
 
+.auth-footer p {
+    margin-bottom: 8px;
+}
+
 .auth-footer a {
     color: #800020;
     text-decoration: none;
@@ -71,6 +75,43 @@
 
 .auth-footer a:hover {
     text-decoration: underline;
+}
+
+/*
+   FORM ACTIONS - Button row for Login and Cancel buttons
+   Two buttons side by side (Login primary, Cancel secondary).
+*/
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+/*
+   Secondary (Cancel) button - outlined burgundy style to match
+   the site's colour scheme without competing with the primary button.
+*/
+.btn-secondary {
+    display: inline-block;
+    width: 100%;
+    padding: 12px 20px;
+    background-color: transparent;
+    color: #800020;
+    border: 2px solid #800020;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #800020;
+    color: #ffffff;
 }
 
 /* Mobile */

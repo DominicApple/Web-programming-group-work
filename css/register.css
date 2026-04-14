@@ -1,9 +1,13 @@
 /*
    REGISTER.CSS - Registration Page Styles
    Developer: Dominic Appleton | ID: 2102508
+
+   Mirrors the login.css card aesthetic (burgundy accent, beige/white
+   palette) but widens the container to accommodate the two-column
+   form layout used on the registration page.
 */
 
-/* Auth page centers the form on screen */
+/* Auth page - centres the form card on screen */
 .auth-page {
     min-height: 100vh;
     display: flex;
@@ -12,10 +16,10 @@
     padding: 20px;
 }
 
-/* Wider container than login to accommodate two-column form rows */
+/* Registration card - wider than login to fit form-row grids */
 .auth-container {
     width: 100%;
-    max-width: 580px;
+    max-width: 700px;
     padding: 40px;
     background-color: #ffffff;
     border-radius: 10px;
@@ -24,6 +28,7 @@
     border-top: 4px solid #800020;
 }
 
+/* Fade in animation */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-25px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -41,12 +46,12 @@
     border-bottom: 2px solid #e8ddd5;
 }
 
-/* Brand name colour override for auth pages */
+/* Brand name */
 .auth-container .brand-name {
     color: #800020;
 }
 
-/* Footer link back to login */
+/* Auth footer */
 .auth-footer {
     text-align: center;
     margin-top: 20px;
@@ -63,6 +68,50 @@
 
 .auth-footer a:hover {
     text-decoration: underline;
+}
+
+/*
+   FORM ACTIONS - Register and Cancel button row.
+   Stacked vertically so the primary action (Register) is on top.
+*/
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+/*
+   Secondary (Cancel) button - outlined burgundy, matching login.css
+*/
+.btn-secondary {
+    display: inline-block;
+    width: 100%;
+    padding: 12px 20px;
+    background-color: transparent;
+    color: #800020;
+    border: 2px solid #800020;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #800020;
+    color: #ffffff;
+}
+
+/* Tablet - collapse two-column rows to single column */
+@media (max-width: 750px) {
+    .auth-container {
+        max-width: 500px;
+        padding: 30px;
+    }
 }
 
 /* Mobile */
