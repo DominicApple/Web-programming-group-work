@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Locked - Seoul Bite</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body class="auth-page">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <main id="main-content" class="auth-container">
+        <div class="text-center mb-3">
+            <img src="../Assets/logo.svg" alt="Seoul Bite Logo" id="logo" style="width: 80px;">
+            <h1 class="brand-name">Seoul Bite</h1>
+        </div>
+
+        <h2>Account Locked</h2>
+
+        <!--
+            Question 1b (iii): Redirect target after 3 failed login attempts.
+        -->
+        <div style="text-align: center; padding: 20px 0;">
+            <p style="color: #b00020; font-size: 18px; margin-bottom: 15px;">
+                &#128274; Too many failed login attempts.
+            </p>
+            <p style="color: #5a3535; margin-bottom: 25px;">
+                Your login session has been locked for security reasons.
+                Please reset your password or try again later.
+            </p>
+            <a href="reset-password.html" class="btn btn-primary" style="display:inline-block; margin-bottom: 10px;">
+                Reset Password
+            </a>
+        </div>
+
+        <div class="auth-footer">
+            <p>
+                <a href="index.html" id="back-to-login">Back to Login</a>
+            </p>
+        </div>
+    </main>
+
+    <div id="toast" role="alert"></div>
+
+    <script src="../js/common.js"></script>
+    <script>
+        /* Clear the attempt counter so the user can try again after reset */
+        document.getElementById('back-to-login').addEventListener('click', function() {
+            sessionStorage.removeItem('loginAttempts');
+        });
+    </script>
+</body>
+</html>
