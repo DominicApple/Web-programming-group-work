@@ -27,9 +27,9 @@
         <!-- Login Form -->
         <form id="login-form" novalidate>
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter your username" required>
-                <div class="error-message" id="username-error"></div>
+                <label for="trn">Tax Registration Number (TRN)</label>
+                <input type="text" id="trn" placeholder="Enter your TRN (e.g. 123456789)" required>
+                <div class="error-message" id="trn-error"></div>
             </div>
 
             <div class="form-group">
@@ -39,7 +39,16 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">Login</button>
+            <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
         </form>
+
+        <!-- Reset Password hyperlink -->
+        <div class="reset-link">
+            <a href="#" id="reset-password-link">Forgot or Reset Password?</a>
+        </div>
+
+        <!-- Attempts remaining indicator -->
+        <div class="attempt-warning" id="attempt-warning"></div>
 
         <div class="auth-footer">
             <p>Don't have an account? <a href="register.html">Register here</a></p>
