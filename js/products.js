@@ -1,17 +1,25 @@
-/* 
+/*
    ================================================================
    PRODUCTS.JS - Products/Menu Page JavaScript
    ================================================================
    This file handles:
-   - Displaying products from an array
+   - Displaying products from an array (Question 2a)
+   - Keeping updated product list in localStorage as AllProducts (Question 2b)
    - Filtering products by category
-   - Adding items to the shopping cart
-   
+   - Adding items to the shopping cart (Question 2e)
+
    Developer: Dominic Appleton
    Student ID: 2102508
    ================================================================
 */
-var products = [
+
+/* ================================================================
+   QUESTION 2a: Product Array
+   ================================================================
+   Array of product objects. Each object has the required fields:
+   name, price, description, image (plus extras for filtering).
+   ================================================================ */
+var defaultProducts = [
     // MAIN DISHES
     {
         id: 1,
@@ -100,6 +108,28 @@ var products = [
 
 
 /* ================================================================
+   QUESTION 2b: Load / Initialise AllProducts in localStorage
+   ================================================================
+   If AllProducts already exists in localStorage we use that copy
+   (so any updates made to the stored list are reflected on the
+   page). If it does not exist yet we save the default array so
+   that it is always available as the source of truth.
+   ================================================================ */
+var storedProducts = localStorage.getItem('AllProducts');
+
+var products;   // This is the live product list used by the page
+
+if (storedProducts) {
+    // QUESTION 2b: Load from localStorage
+    products = JSON.parse(storedProducts);
+} else {
+    // First visit – seed localStorage with the default products
+    products = defaultProducts;
+    localStorage.setItem('AllProducts', JSON.stringify(defaultProducts));
+}
+
+
+/* ================================================================
    DOM ELEMENT REFERENCES
    ================================================================
    Getting references to HTML elements we need to manipulate.
@@ -130,15 +160,18 @@ var filterButtons = document.querySelectorAll('.filter-btn');
    We initialize the page by rendering products and updating UI.
    ================================================================ */
 window.addEventListener('DOMContentLoaded', function() {
-    // Render all products initially (category 'all')
+    // QUESTION 2b: Ensure AllProducts is always up-to-date on load
+    localStorage.setItem('AllProducts', JSON.stringify(products));
+
+    // QUESTION 2c: Render all products initially (category 'all')
     renderProducts('all');
-    
+
     // Update the cart count in navigation
     updateCartCountDisplay();
-    
+
     // Update login/logout link
     updateAuthLink();
-    
+
     // Setup filter button events AFTER DOM is loaded
     setupFilterButtons();
 });
