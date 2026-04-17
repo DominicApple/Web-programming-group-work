@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Seoul Bite</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <!-- Skip link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="brand">
+                <img src="../Assets/logo.svg" alt="Seoul Bite Logo" id="logo">
+                <span class="brand-name">Seoul Bite</span>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="products.html">Menu</a></li>
+                    <li><a href="cart.html">Cart <span id="cart-count" class="cart-badge"></span></a></li>
+                    <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="#" id="auth-link">Login</a></li>
+                </ul>
+            </nav>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle menu">&#9776;</button>
+        </div>
+        <nav class="mobile-nav" id="mobile-nav">
+            <ul>
+                <li><a href="products.html">Menu</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="#" id="auth-link-mobile">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="dashboard-page">
+
+        <div class="dashboard-header">
+            <h1>Dashboard</h1>
+            <p class="dashboard-subtitle">User statistics and invoice management</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" id="tab-frequency" onclick="switchTab('frequency')">User Frequency</button>
+            <button class="tab-btn" id="tab-invoices" onclick="switchTab('invoices')">All Invoices</button>
+            <button class="tab-btn" id="tab-my-invoices" onclick="switchTab('my-invoices')">My Invoices</button>
+        </div>
+
+        <!-- =====================================================
+             TAB 1: User Frequency (ShowUserFrequency)
+             Q6(a): Show user frequency based on gender and age group.
+             ===================================================== -->
+        <section id="section-frequency" class="tab-section active">
+            <div class="section-title-row">
+                <h2>User Frequency</h2>
+                <button class="btn btn-sm btn-gold" onclick="ShowUserFrequency()">Refresh</button>
+            </div>
+
+            <!-- Gender Chart -->
+            <div class="chart-card">
+                <h3>Users by Gender</h3>
+                <p class="chart-desc">Q6(a)(i): Number of registered users per gender category.</p>
+                <div id="gender-chart" class="bar-chart"></div>
+                <p id="gender-no-data" class="no-data-msg hidden">No registered users found.</p>
+            </div>
+
+            <!-- Age Group Chart -->
+            <div class="chart-card">
+                <h3>Users by Age Group</h3>
+                <p class="chart-desc">Q6(a)(ii): Number of registered users per age group.</p>
+                <div id="age-chart" class="bar-chart"></div>
+                <p id="age-no-data" class="no-data-msg hidden">No registered users found.</p>
+            </div>
+        </section>
+
+        <!-- =====================================================
+             TAB 2: All Invoices (ShowInvoices)
+             Q6(b): Displays all invoices. Search by TRN.
+             ===================================================== -->
+        <section id="section-invoices" class="tab-section hidden">
+            <div class="section-title-row">
+                <h2>All Invoices</h2>
+                <button class="btn btn-sm btn-gold" onclick="ShowInvoices()">Refresh</button>
+            </div>
+
+            <!-- TRN Search -->
+            <div class="search-bar">
+                <input type="text" id="trn-search" placeholder="Search by TRN (e.g. 123-456-789)" maxlength="11">
+                <button class="btn btn-primary" onclick="searchByTRN()">Search</button>
+                <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
+            </div>
+
+            <div id="invoices-list"></div>
+            <p id="invoices-no-data" class="no-data-msg hidden">No invoices found.</p>
+        </section>
+
+        <!-- =====================================================
+             TAB 3: My Invoices (GetUserInvoices)
+             Q6(c): Displays all invoices for the logged-in user by TRN.
+             ===================================================== -->
+        <section id="section-my-invoices" class="tab-section hidden">
+            <div class="section-title-row">
+                <h2>My Invoices</h2>
+                <button class="btn btn-sm btn-gold" onclick="GetUserInvoices()">Refresh</button>
+            </div>
+
+            <div id="my-invoices-list"></div>
+            <p id="my-invoices-no-data" class="no-data-msg hidden">No invoices found for your account.</p>
+            <p id="my-invoices-login-msg" class="no-data-msg hidden">Please <a href="index.html">login</a> to view your invoices.</p>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Seoul Bite. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" role="alert"></div>
+
+    <script src="../js/common.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

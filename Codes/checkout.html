@@ -23,6 +23,7 @@
                 <ul>
                     <li><a href="products.html">Menu</a></li>
                     <li><a href="cart.html">Cart</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
                     <li><a href="about.html">About Us</a></li>
                 </ul>
             </nav>
@@ -153,8 +154,12 @@
             <h2 style="color: #2e7d32;">Order Confirmed!</h2>
             <p style="margin: 20px 0; color: #5a3535;">Thank you for your order.</p>
             <p style="color: #5a3535;">Order Number: <strong id="order-number" style="color: #800020;"></strong></p>
+            <p style="margin-top: 10px; color: #5a3535;">A receipt has been "sent" to your email address.</p>
             <p style="margin-top: 20px; color: #5a3535;">We'll deliver your food soon!</p>
-            <button class="btn btn-primary" id="done-btn" style="margin-top: 20px;">Continue Shopping</button>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+                <a id="invoice-link" href="invoice.html" class="btn btn-gold">View Invoice</a>
+                <button class="btn btn-primary" id="done-btn">Continue Shopping</button>
+            </div>
         </div>
     </div>
 

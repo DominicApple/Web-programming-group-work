@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - Seoul Bite</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/invoice.css">
+</head>
+<body>
+    <!-- Skip link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="brand">
+                <img src="../Assets/logo.svg" alt="Seoul Bite Logo" id="logo">
+                <span class="brand-name">Seoul Bite</span>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="products.html">Menu</a></li>
+                    <li><a href="cart.html">Cart <span id="cart-count" class="cart-badge"></span></a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="#" id="auth-link">Login</a></li>
+                </ul>
+            </nav>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle menu">&#9776;</button>
+        </div>
+        <nav class="mobile-nav" id="mobile-nav">
+            <ul>
+                <li><a href="products.html">Menu</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="#" id="auth-link-mobile">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="invoice-page">
+        <!-- Not found message -->
+        <div id="invoice-not-found" class="not-found-msg hidden">
+            <h2>Invoice Not Found</h2>
+            <p>The invoice you are looking for does not exist.</p>
+            <a href="dashboard.html" class="btn btn-primary">Go to Dashboard</a>
+        </div>
+
+        <!-- Invoice Container -->
+        <div id="invoice-container" class="hidden">
+            <!-- Print / Back buttons -->
+            <div class="invoice-actions no-print">
+                <a href="dashboard.html" class="btn btn-secondary">&larr; Back to Dashboard</a>
+                <button onclick="window.print()" class="btn btn-gold">Print Invoice</button>
+            </div>
+
+            <!-- Invoice Document -->
+            <div class="invoice-doc" id="invoice-doc">
+                <!-- Company Header -->
+                <div class="invoice-header">
+                    <div class="invoice-brand">
+                        <img src="../Assets/logo.svg" alt="Seoul Bite Logo" class="invoice-logo">
+                        <div>
+                            <h1 class="invoice-company">Seoul Bite</h1>
+                            <p class="invoice-tagline">Authentic Korean Cuisine Delivered</p>
+                        </div>
+                    </div>
+                    <div class="invoice-title-block">
+                        <h2 class="invoice-title">INVOICE</h2>
+                        <p><strong>Invoice #:</strong> <span id="inv-number"></span></p>
+                        <p><strong>Date:</strong> <span id="inv-date"></span></p>
+                        <p><strong>Order #:</strong> <span id="inv-order"></span></p>
+                    </div>
+                </div>
+
+                <hr class="invoice-divider">
+
+                <!-- Bill To / Shipping Info -->
+                <div class="invoice-parties">
+                    <div class="invoice-from">
+                        <h3>From</h3>
+                        <p><strong>Seoul Bite Restaurant</strong></p>
+                        <p>Kingston, Jamaica</p>
+                        <p>info@seoulbite.com</p>
+                        <p>+1 (876) 000-0000</p>
+                    </div>
+                    <div class="invoice-to">
+                        <h3>Bill To</h3>
+                        <p><strong id="inv-customer"></strong></p>
+                        <p id="inv-address"></p>
+                        <p id="inv-parish"></p>
+                        <p id="inv-phone"></p>
+                        <p>TRN: <span id="inv-trn"></span></p>
+                    </div>
+                </div>
+
+                <hr class="invoice-divider">
+
+                <!-- Items Table -->
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th class="text-right">Unit Price</th>
+                            <th class="text-right">Qty</th>
+                            <th class="text-right">Discount</th>
+                            <th class="text-right">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inv-items"></tbody>
+                </table>
+
+                <hr class="invoice-divider">
+
+                <!-- Totals -->
+                <div class="invoice-totals">
+                    <div class="totals-row">
+                        <span>Subtotal</span>
+                        <span id="inv-subtotal"></span>
+                    </div>
+                    <div class="totals-row">
+                        <span>Discount (10%)</span>
+                        <span id="inv-discount" class="text-green"></span>
+                    </div>
+                    <div class="totals-row">
+                        <span>GCT Tax (15%)</span>
+                        <span id="inv-tax"></span>
+                    </div>
+                    <div class="totals-row">
+                        <span>Delivery Fee</span>
+                        <span id="inv-delivery"></span>
+                    </div>
+                    <div class="totals-row total-row">
+                        <span>TOTAL</span>
+                        <span id="inv-total"></span>
+                    </div>
+                    <div class="totals-row">
+                        <span>Payment Method</span>
+                        <span id="inv-payment"></span>
+                    </div>
+                </div>
+
+                <!-- Footer note -->
+                <div class="invoice-footer">
+                    <p>Thank you for choosing Seoul Bite! Your receipt has been sent to your registered email.</p>
+                    <p class="inv-small">This is a computer-generated invoice and requires no signature.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Seoul Bite. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" role="alert"></div>
+
+    <script src="../js/common.js"></script>
+    <script src="../js/invoice.js"></script>
+</body>
+</html>

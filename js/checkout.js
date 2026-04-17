@@ -288,42 +288,103 @@ function clearAllErrors() {
 /* ================================================================
    PROCESS ORDER FUNCTION
    ================================================================
-   Creates the order and saves it to localStorage.
+   Q5: Creates the order, generates an invoice, saves to
+   localStorage keys seoulBiteOrders and AllInvoices, and
+   appends the invoice to the user's invoices[] in RegistrationData.
    ================================================================ */
 function processOrder() {
-    // Generate unique order number
     var timestamp = Date.now().toString().slice(-6);
     var random = Math.floor(Math.random() * 1000);
     var orderNumber = 'SB' + timestamp + random;
-    
-    // Create order object
+
+    // Q5(a): Generate unique invoice number
+    var invoiceNumber = 'INV-' + Date.now() + '-' + Math.floor(Math.random() * 9000 + 1000);
+
+    var cartItems = JSON.parse(localStorage.getItem('seoulBiteCart')) || [];
+    var totals = JSON.parse(localStorage.getItem('seoulBiteOrderTotals')) || {};
+
+    var shippingInfo = {
+        fullName: document.getElementById('fullName').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        parish: document.getElementById('parish').value,
+        instructions: document.getElementById('instructions').value
+    };
+
+    // Get current user session and TRN from RegistrationData
+    var session = JSON.parse(localStorage.getItem('seoulBiteSession')) || {};
+    var registrationData = JSON.parse(localStorage.getItem('RegistrationData')) || [];
+    var currentUser = null;
+    for (var u = 0; u < registrationData.length; u++) {
+        if (registrationData[u].trn === session.trn ||
+            registrationData[u].email === session.email) {
+            currentUser = registrationData[u];
+            break;
+        }
+    }
+
+    // Q5(a): Build invoice object with all required fields
+    var invoice = {
+        invoiceNumber: invoiceNumber,
+        companyName: 'Seoul Bite',
+        dateOfInvoice: new Date().toISOString(),
+        trn: currentUser ? currentUser.trn : 'N/A',
+        customerName: (session.firstName ? session.firstName + ' ' + (session.lastName || '') : shippingInfo.fullName).trim(),
+        shipping: shippingInfo,
+        items: cartItems,
+        subtotal: totals.subtotal || 0,
+        discount: totals.discount || 0,
+        taxes: totals.tax || 0,
+        deliveryFee: totals.deliveryFee || 0,
+        total: totals.total || 0,
+        paymentMethod: document.querySelector('input[name="payment"]:checked').value,
+        orderNumber: orderNumber
+    };
+
+    // Q5(b): Save invoice to AllInvoices in localStorage
+    var allInvoices = JSON.parse(localStorage.getItem('AllInvoices')) || [];
+    allInvoices.push(invoice);
+    localStorage.setItem('AllInvoices', JSON.stringify(allInvoices));
+
+    // Q5(b): Append invoice to user's invoices[] in RegistrationData
+    if (currentUser) {
+        for (var r = 0; r < registrationData.length; r++) {
+            if (registrationData[r].trn === currentUser.trn) {
+                if (!registrationData[r].invoices) {
+                    registrationData[r].invoices = [];
+                }
+                registrationData[r].invoices.push(invoice);
+                break;
+            }
+        }
+        localStorage.setItem('RegistrationData', JSON.stringify(registrationData));
+    }
+
+    // Save to seoulBiteOrders for existing compatibility
     var order = {
         orderNumber: orderNumber,
-        items: JSON.parse(localStorage.getItem('seoulBiteCart')),
-        totals: JSON.parse(localStorage.getItem('seoulBiteOrderTotals')),
-        shipping: {
-            fullName: document.getElementById('fullName').value,
-            phone: document.getElementById('phone').value,
-            address: document.getElementById('address').value,
-            parish: document.getElementById('parish').value
-        },
-        paymentMethod: document.querySelector('input[name="payment"]:checked').value,
+        invoiceNumber: invoiceNumber,
+        items: cartItems,
+        totals: totals,
+        shipping: shippingInfo,
+        paymentMethod: invoice.paymentMethod,
+        trn: invoice.trn,
         createdAt: new Date().toISOString()
     };
-    
-    // Get existing orders and add new one
     var orders = JSON.parse(localStorage.getItem('seoulBiteOrders')) || [];
     orders.push(order);
-    
-    // Save orders
     localStorage.setItem('seoulBiteOrders', JSON.stringify(orders));
-    
+
     // Clear cart
     localStorage.removeItem('seoulBiteCart');
     localStorage.removeItem('seoulBiteOrderTotals');
-    
+
+    // Store invoice number for the modal link
+    localStorage.setItem('lastInvoiceNumber', invoiceNumber);
+
     // DOM MANIPULATION: Show confirmation modal
     document.getElementById('order-number').textContent = orderNumber;
+    document.getElementById('invoice-link').href = 'invoice.html?inv=' + encodeURIComponent(invoiceNumber);
     document.getElementById('confirmation-modal').classList.add('show');
 }
 

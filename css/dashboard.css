@@ -1,0 +1,287 @@
+/*
+   ================================================================
+   DASHBOARD.CSS - Dashboard Page Styles
+   ================================================================
+*/
+
+/* ----------------------------------------------------------------
+   Page Layout
+   ---------------------------------------------------------------- */
+.dashboard-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+}
+
+.dashboard-header {
+    margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+}
+
+.dashboard-subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+/* ----------------------------------------------------------------
+   Tab Navigation
+   ---------------------------------------------------------------- */
+.tab-nav {
+    display: flex;
+    gap: 6px;
+    border-bottom: 2px solid var(--gray-light);
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: color var(--transition-fast), border-color var(--transition-fast);
+    font-weight: 500;
+}
+
+.tab-btn:hover {
+    color: var(--burgundy);
+}
+
+.tab-btn.active {
+    color: var(--burgundy);
+    border-bottom-color: var(--burgundy);
+    font-weight: 700;
+}
+
+/* ----------------------------------------------------------------
+   Tab Sections
+   ---------------------------------------------------------------- */
+.tab-section {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ----------------------------------------------------------------
+   Section Header Row
+   ---------------------------------------------------------------- */
+.section-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.section-title-row h2 {
+    font-size: 1.4rem;
+    color: var(--primary-dark);
+    margin: 0;
+}
+
+/* ----------------------------------------------------------------
+   Chart Cards
+   ---------------------------------------------------------------- */
+.chart-card {
+    background: var(--white);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: var(--shadow-sm);
+}
+
+.chart-card h3 {
+    font-size: 1.1rem;
+    color: var(--primary-dark);
+    margin: 0 0 5px;
+}
+
+.chart-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin: 0 0 20px;
+}
+
+/* ----------------------------------------------------------------
+   Bar Chart (Q6a frequency charts)
+   ----------------------------------------------------------------
+   Each row has: label | bar track (fills proportionally) | count
+   The bar-fill width is set via inline style in JS, mimicking the
+   img-width stretching technique from the assignment specification.
+   ---------------------------------------------------------------- */
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bar-label {
+    width: 80px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.bar-track {
+    flex: 1;
+    background-color: var(--gray-light);
+    border-radius: 4px;
+    height: 28px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+    min-width: 4px;
+}
+
+.bar-count {
+    width: 30px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    flex-shrink: 0;
+}
+
+/* ----------------------------------------------------------------
+   Search Bar (Q6b TRN search)
+   ---------------------------------------------------------------- */
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.search-bar input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 14px;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    background: var(--white);
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: var(--burgundy);
+}
+
+/* ----------------------------------------------------------------
+   Invoice Table (shared by ShowInvoices and GetUserInvoices)
+   ---------------------------------------------------------------- */
+.inv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    background: var(--white);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.inv-table thead tr {
+    background-color: var(--primary-dark);
+    color: var(--white);
+}
+
+.inv-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.inv-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--gray-light);
+    color: var(--text-secondary);
+    vertical-align: middle;
+}
+
+.inv-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.inv-table tbody tr:hover {
+    background-color: var(--off-white);
+}
+
+.inv-table code {
+    font-family: monospace;
+    font-size: 0.8rem;
+    background: var(--primary-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--burgundy);
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+/* ----------------------------------------------------------------
+   Small button variant
+   ---------------------------------------------------------------- */
+.btn-sm {
+    padding: 6px 14px;
+    font-size: 0.82rem;
+}
+
+/* ----------------------------------------------------------------
+   No-data messages
+   ---------------------------------------------------------------- */
+.no-data-msg {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px 20px;
+    font-size: 0.95rem;
+}
+
+/* ----------------------------------------------------------------
+   Responsive
+   ---------------------------------------------------------------- */
+@media (max-width: 640px) {
+    .inv-table th:nth-child(3),
+    .inv-table td:nth-child(3) {
+        display: none;
+    }
+
+    .bar-label {
+        width: 60px;
+        font-size: 0.8rem;
+    }
+
+    .tab-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+}
