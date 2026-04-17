@@ -5,10 +5,11 @@
    This file handles:
    - Login form validation with TRN (Tax Registration Number)
    - User authentication against localStorage RegistrationData
-   - 3-attempt limit with account lockout
-   - Password reset functionality by matching TRN
-   - Session creation
-   
+   - 3-attempt limit with account lockout redirect
+   - Cancel button (clear form)
+   - Reset Password link (redirects to reset-password.html)
+   - Session creation on successful login
+
    Developer: Dominic Appleton
    Student ID: 2102508
    ================================================================
@@ -18,127 +19,63 @@
 /* ================================================================
    DOM ELEMENT REFERENCES
    ================================================================
-   We get references to HTML elements using getElementById.
-   This is called "DOM Manipulation" - accessing elements in the page.
-   
-   The DOM (Document Object Model) is a tree structure representing
-   all the HTML elements on the page.
+   DOM MANIPULATION: Getting references to HTML elements using
+   getElementById. The DOM (Document Object Model) represents all
+   HTML elements as a tree we can read and change with JavaScript.
    ================================================================ */
 
 // Get reference to the login form element
-// This allows us to listen for when the form is submitted
 var loginForm = document.getElementById('login-form');
 
-// Get references to the input fields
-// We need these to read what the user types
-var trnInput = document.getElementById('trn');
+// Get references to the input fields (TRN replaces username - Q1b i)
+var trnInput      = document.getElementById('trn');
 var passwordInput = document.getElementById('password');
 
 // Get references to error message elements
-// We'll use these to show validation errors
-var trnError = document.getElementById('trn-error');
+var trnError      = document.getElementById('trn-error');
 var passwordError = document.getElementById('password-error');
-var loginError = document.getElementById('login-error');
+var loginError    = document.getElementById('login-error');
 
-// Get reference to attempt warning element
+// Attempt warning display
 var attemptWarning = document.getElementById('attempt-warning');
 
-// Get reference to reset password link
-var resetPasswordLink = document.getElementById('reset-password-link');
-
-// Get reference to cancel button
+// Cancel button
 var cancelBtn = document.getElementById('cancel-btn');
 
 
 /* ================================================================
-   ATTEMPT TRACKING VARIABLES
+   LOGIN ATTEMPT COUNTER
    ================================================================
-   These variables track how many failed login attempts the user has made.
-   Maximum attempts = 3 before account is locked.
+   Question 1b (iii): A visitor is given THREE attempts to enter a
+   correct TRN and password. On failure after 3 attempts they are
+   redirected to an account locked page.
+
+   The counter is stored in sessionStorage so it resets when the
+   browser tab is closed, but persists across page refreshes
+   within the same session.
    ================================================================ */
-var ATTEMPTS_KEY = 'login_attempts_count';
-var MAX_ATTEMPTS = 3;
-
-
-/* ================================================================
-   HELPER FUNCTION: Get Attempts
-   ================================================================
-   Retrieves the current number of failed attempts from sessionStorage.
-   Uses JSON.parse() to convert the stored JSON string back to a number.
-   ================================================================ */
-function getAttempts() {
-    var attemptsData = sessionStorage.getItem(ATTEMPTS_KEY);
-    
-    if (!attemptsData) {
-        return 0;
-    }
-    
-    try {
-        // Use JSON.parse() to convert JSON string back to number
-        return JSON.parse(attemptsData);
-    } catch (e) {
-        // Fallback to parseInt if JSON parsing fails
-        return parseInt(attemptsData, 10) || 0;
-    }
-}
-
-
-/* ================================================================
-   HELPER FUNCTION: Increment Attempts
-   ================================================================
-   Increases the failed attempt counter by 1.
-   Uses JSON.stringify() to store the number as a JSON string.
-   ================================================================ */
-function incrementAttempts() {
-    var currentAttempts = getAttempts();
-    var newAttempts = currentAttempts + 1;
-    
-    // Use JSON.stringify() to convert number to JSON string
-    sessionStorage.setItem(ATTEMPTS_KEY, JSON.stringify(newAttempts));
-    
-    return newAttempts;
-}
-
-
-/* ================================================================
-   HELPER FUNCTION: Reset Attempts
-   ================================================================
-   Clears the failed attempt counter on successful login or password reset.
-   ================================================================ */
-function resetAttempts() {
-    sessionStorage.removeItem(ATTEMPTS_KEY);
-}
-
-
-/* ================================================================
-   HELPER FUNCTION: Is Account Locked
-   ================================================================
-   Checks if the account is locked due to too many failed attempts.
-   Returns true if attempts >= 3, false otherwise.
-   ================================================================ */
-function isAccountLocked() {
-    return getAttempts() >= MAX_ATTEMPTS;
-}
+var loginAttempts = parseInt(sessionStorage.getItem('loginAttempts')) || 0;
+var MAX_ATTEMPTS  = 3;
 
 
 /* ================================================================
    HELPER FUNCTION: Update Attempts Display
    ================================================================
-   Updates the UI to show how many attempts remain.
-   Shows a warning message when attempts are running low.
+   Updates the on-screen warning showing how many attempts remain.
    ================================================================ */
 function updateAttemptsDisplay() {
-    var attemptsUsed = getAttempts();
-    var remaining = Math.max(0, MAX_ATTEMPTS - attemptsUsed);
-    
-    if (attemptWarning) {
-        if (remaining === 0) {
-            attemptWarning.innerHTML = '<span style="color:#d32f2f;">⚠️ Too many failed attempts. Account temporarily locked. Please reset your password.</span>';
-            attemptWarning.style.display = 'block';
-        } else {
-            attemptWarning.innerHTML = '<span> Remaining attempts: ' + remaining + ' of ' + MAX_ATTEMPTS + '</span>';
-            attemptWarning.style.display = 'block';
-        }
+    if (!attemptWarning) return;
+
+    var remaining = MAX_ATTEMPTS - loginAttempts;
+
+    if (loginAttempts > 0 && loginAttempts < MAX_ATTEMPTS) {
+        attemptWarning.innerHTML = '<span>Remaining attempts: ' + remaining + ' of ' + MAX_ATTEMPTS + '</span>';
+        attemptWarning.classList.add('show');
+    } else if (loginAttempts >= MAX_ATTEMPTS) {
+        attemptWarning.innerHTML = '<span style="color:#d32f2f;">Account locked. Please reset your password.</span>';
+        attemptWarning.classList.add('show');
+    } else {
+        attemptWarning.classList.remove('show');
     }
 }
 
@@ -146,302 +83,134 @@ function updateAttemptsDisplay() {
 /* ================================================================
    HELPER FUNCTION: Get Registration Data
    ================================================================
-   Retrieves user registration data from localStorage.
+   Retrieves the user array from localStorage key 'RegistrationData'.
    Uses JSON.parse() to convert the stored JSON string back to an array.
-   
-   The data is stored under the key 'RegistrationData'.
    ================================================================ */
 function getRegistrationData() {
     var rawData = localStorage.getItem('RegistrationData');
-    
-    // If no data exists, return empty array
+
     if (!rawData) {
         return [];
     }
-    
+
     try {
-        // Use JSON.parse() to convert JSON string back to array/object
-        var parsedData = JSON.parse(rawData);
-        
-        // Ensure we return an array
-        if (Array.isArray(parsedData)) {
-            return parsedData;
-        }
-        return [];
+        // JSON.parse() converts JSON string back to JavaScript array
+        var parsed = JSON.parse(rawData);
+        return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
-        console.error('Error parsing RegistrationData with JSON.parse():', e);
+        console.error('Error parsing RegistrationData:', e);
         return [];
     }
 }
 
 
 /* ================================================================
-   HELPER FUNCTION: Save Registration Data
+   EVENT HANDLING: Form Submit Event
    ================================================================
-   Saves user registration data to localStorage.
-   Uses JSON.stringify() to convert the array to a JSON string.
+   addEventListener attaches a function to run when an event occurs.
+   The 'submit' event fires when user clicks Login or presses Enter.
+   e.preventDefault() stops the page from reloading.
    ================================================================ */
-function saveRegistrationData(data) {
-    try {
-        // Use JSON.stringify() to convert array to JSON string
-        var jsonString = JSON.stringify(data);
-        localStorage.setItem('RegistrationData', jsonString);
-        return true;
-    } catch (e) {
-        console.error('Error stringifying RegistrationData with JSON.stringify():', e);
-        return false;
-    }
-}
+loginForm.addEventListener('submit', function(e) {
+    // Prevent the browser's default form submission (page reload)
+    e.preventDefault();
 
-
-/* ================================================================
-   HELPER FUNCTION: Validate Credentials
-   ================================================================
-   Checks if the provided TRN and password match any user in
-   the RegistrationData stored in localStorage.
-   
-   Uses a FOR LOOP to iterate through the array of registered users.
-   ================================================================ */
-function validateCredentials(trn, password) {
-    var registrations = getRegistrationData();
-    
-    if (!registrations.length) {
-        return false;
-    }
-    
-    // FOR LOOP: Check each registered user for a match
-    for (var i = 0; i < registrations.length; i++) {
-        var user = registrations[i];
-        
-        // Compare TRN (case-insensitive trim) and password
-        if (user.trn && user.trn.toString().trim() === trn.toString().trim() &&
-            user.password === password) {
-            return true;
-        }
-    }
-    
-    return false;
-}
-
-
-/* ================================================================
-   HELPER FUNCTION: Find User By TRN
-   ================================================================
-   Searches for a user in RegistrationData by their TRN.
-   Returns the user object if found, null otherwise.
-   ================================================================ */
-function findUserByTRN(trn) {
-    var registrations = getRegistrationData();
-    
-    for (var i = 0; i < registrations.length; i++) {
-        if (registrations[i].trn && registrations[i].trn.toString().trim() === trn.toString().trim()) {
-            return registrations[i];
-        }
-    }
-    
-    return null;
-}
-
-
-/* ================================================================
-   HELPER FUNCTION: Update User Password
-   ================================================================
-   Updates the password for a user identified by TRN.
-   Uses findUserByTRN to locate the user, then saves the updated data.
-   ================================================================ */
-function updateUserPassword(trn, newPassword) {
-    var registrations = getRegistrationData();
-    var userFound = false;
-    
-    for (var i = 0; i < registrations.length; i++) {
-        if (registrations[i].trn && registrations[i].trn.toString().trim() === trn.toString().trim()) {
-            registrations[i].password = newPassword;
-            userFound = true;
-            break;
-        }
-    }
-    
-    if (userFound) {
-        return saveRegistrationData(registrations);
-    }
-    
-    return false;
-}
-
-
-/* ================================================================
-   TOAST NOTIFICATION FUNCTION
-   ================================================================
-   Shows a temporary popup message that fades away after 3 seconds.
-   Used for success and error feedback.
-   ================================================================ */
-function showToast(message, isError) {
-    var toast = document.getElementById('toast');
-    
-    if (!toast) {
-        return;
-    }
-    
-    toast.textContent = message;
-    
-    if (isError) {
-        toast.style.backgroundColor = '#d32f2f';
-    } else {
-        toast.style.backgroundColor = '#2e7d32';
-    }
-    
-    toast.style.opacity = '1';
-    
-    setTimeout(function() {
-        toast.style.opacity = '0';
-    }, 3000);
-}
-
-
-/* ================================================================
-   REDIRECT FUNCTIONS
-   ================================================================
-   Handles navigation to different pages based on login outcome.
-   ================================================================ */
-function redirectToCatalog() {
-    window.location.href = 'product-catalog.html';
-}
-
-function redirectToLockedPage() {
-    window.location.href = 'error-locked.html';
-}
-
-
-/* ================================================================
-   PASSWORD RESET FUNCTIONALITY
-   ================================================================
-   Allows user to reset their password by matching their TRN.
-   
-   Process:
-   1. Prompt user for their TRN
-   2. Search for matching TRN in RegistrationData
-   3. If found, prompt for new password
-   4. Update the password in localStorage
-   5. Reset attempt counter
-   ================================================================ */
-function handlePasswordReset() {
-    var trnToReset = prompt('Please enter your TRN to reset password:');
-    
-    if (!trnToReset || trnToReset.trim() === '') {
-        showToast('TRN is required for password reset', true);
-        return;
-    }
-    
-    var registrations = getRegistrationData();
-    
-    if (!registrations.length) {
-        showToast('No registered users found. Please register first.', true);
-        return;
-    }
-    
-    // Find user by TRN
-    var userIndex = -1;
-    for (var i = 0; i < registrations.length; i++) {
-        if (registrations[i].trn && registrations[i].trn.toString().trim() === trnToReset.trim()) {
-            userIndex = i;
-            break;
-        }
-    }
-    
-    if (userIndex === -1) {
-        showToast('No account found with that TRN. Please check and try again.', true);
-        return;
-    }
-    
-    // Ask for new password
-    var newPassword = prompt('Enter new password (minimum 4 characters):');
-    
-    if (!newPassword || newPassword.trim().length < 4) {
-        showToast('Password must be at least 4 characters. Reset cancelled.', true);
-        return;
-    }
-    
-    var confirmPassword = prompt('Confirm new password:');
-    
-    if (newPassword !== confirmPassword) {
-        showToast('Passwords do not match. Reset cancelled.', true);
-        return;
-    }
-    
-    // Update the password
-    registrations[userIndex].password = newPassword;
-    
-    // Save back to localStorage using JSON.stringify()
-    var saveSuccess = saveRegistrationData(registrations);
-    
-    if (saveSuccess) {
-        // Reset attempts on successful password reset
-        resetAttempts();
-        updateAttemptsDisplay();
-        
-        showToast('Password successfully reset! You can now login with your new password.', false);
-        
-        // Clear form fields
-        clearForm();
-        clearErrors();
-        
-        console.log('Password reset successful. RegistrationData updated.');
-    } else {
-        showToast('Error saving new password. Please try again.', true);
-    }
-}
-
-
-/* ================================================================
-   CANCEL BUTTON FUNCTION
-   ================================================================
-   Clears all data from the login form when cancel button is clicked.
-   ================================================================ */
-function onCancel() {
-    clearForm();
+    // Clear any previous error messages
     clearErrors();
-    showToast('Form cleared', false);
-}
+
+    // Validate the form - if valid, try to log in
+    if (validateLoginForm()) {
+        attemptLogin();
+    }
+});
 
 
 /* ================================================================
-   CLEAR FORM FUNCTION
+   EVENT HANDLING: Cancel Button
    ================================================================
-   Resets all input fields in the login form to empty.
+   Question 1b (v): Cancel button clears data from the Login form.
    ================================================================ */
-function clearForm() {
-    if (trnInput) trnInput.value = '';
-    if (passwordInput) passwordInput.value = '';
-}
+cancelBtn.addEventListener('click', function() {
+    loginForm.reset();
+    clearErrors();
+});
+
+
+/* ================================================================
+   EVENT HANDLING: Blur Events (real-time validation)
+   ================================================================
+   The 'blur' event fires when a user leaves an input field.
+   We validate as they fill out the form for immediate feedback.
+   ================================================================ */
+trnInput.addEventListener('blur', function() {
+    validateTRN();
+});
+
+passwordInput.addEventListener('blur', function() {
+    validatePassword();
+});
+
+
+/* ================================================================
+   EVENT HANDLING: Focus Events (clear errors on re-entry)
+   ================================================================
+   The 'focus' event fires when user clicks into an input field.
+   Clears the error so they can try again cleanly.
+   ================================================================ */
+trnInput.addEventListener('focus', function() {
+    hideError(trnInput, trnError);
+});
+
+passwordInput.addEventListener('focus', function() {
+    hideError(passwordInput, passwordError);
+});
+
+
+/* ================================================================
+   EVENT HANDLING: TRN Auto-Format
+   ================================================================
+   Auto-formats TRN as user types: inserts dashes after digit 3
+   and 6 so it matches the required format 000-000-000.
+   ================================================================ */
+trnInput.addEventListener('input', function() {
+    // Strip everything that is not a digit
+    var digits = this.value.replace(/\D/g, '');
+
+    // Rebuild with dashes: 000-000-000
+    if (digits.length > 6) {
+        this.value = digits.substring(0,3) + '-' + digits.substring(3,6) + '-' + digits.substring(6,9);
+    } else if (digits.length > 3) {
+        this.value = digits.substring(0,3) + '-' + digits.substring(3,6);
+    } else {
+        this.value = digits;
+    }
+});
 
 
 /* ================================================================
    FORM VALIDATION: Validate TRN
    ================================================================
-   Checks if TRN field is valid.
-   
-   Validation rules:
+   Question 1b (i): Login uses TRN in format 000-000-000.
+
+   Rules:
    1. Cannot be empty
-   2. Must be at least 9 characters (minimum TRN length)
-   
-   Returns true if valid, false if invalid
+   2. Must match format 000-000-000 exactly (regex check)
    ================================================================ */
 function validateTRN() {
-    var trn = trnInput.value.trim();
-    
-    // VALIDATION: Check if field is empty
-    if (trn === '') {
+    var trnValue = trnInput.value.trim();
+
+    if (trnValue === '') {
         showError(trnInput, trnError, 'TRN is required');
         return false;
     }
-    
-    // VALIDATION: Check minimum length
-    if (trn.length < 9) {
-        showError(trnInput, trnError, 'TRN must be at least 9 characters');
+
+    // Regex: exactly 3 digits, dash, 3 digits, dash, 3 digits
+    var trnRegex = /^\d{3}-\d{3}-\d{3}$/;
+    if (!trnRegex.test(trnValue)) {
+        showError(trnInput, trnError, 'TRN must be in the format 000-000-000');
         return false;
     }
-    
-    // If we get here, TRN is valid
+
     hideError(trnInput, trnError);
     return true;
 }
@@ -450,45 +219,40 @@ function validateTRN() {
 /* ================================================================
    FORM VALIDATION: Validate Password
    ================================================================
-   Checks if password field is valid.
-   
-   Validation rules:
+   Rules:
    1. Cannot be empty
-   
-   Returns true if valid, false if invalid
+   2. Must be at least 8 characters
    ================================================================ */
 function validatePassword() {
-    var password = passwordInput.value;
-    
-    // VALIDATION: Check if empty
-    if (password === '') {
+    var pass = passwordInput.value;
+
+    if (pass === '') {
         showError(passwordInput, passwordError, 'Password is required');
         return false;
     }
-    
+
+    if (pass.length < 8) {
+        showError(passwordInput, passwordError, 'Password must be at least 8 characters');
+        return false;
+    }
+
     hideError(passwordInput, passwordError);
     return true;
 }
 
 
 /* ================================================================
-   FORM VALIDATION: Validate Entire Form
+   FORM VALIDATION: Validate Entire Login Form
    ================================================================
-   This function validates all form fields.
-   Returns true if ALL fields are valid, false otherwise.
+   Calls both field validators.
+   Returns true only if ALL fields are valid.
    ================================================================ */
 function validateLoginForm() {
     var isValid = true;
-    
-    // Validate each field - if any fail, form is invalid
-    if (!validateTRN()) {
-        isValid = false;
-    }
-    
-    if (!validatePassword()) {
-        isValid = false;
-    }
-    
+
+    if (!validateTRN())      isValid = false;
+    if (!validatePassword()) isValid = false;
+
     return isValid;
 }
 
@@ -496,74 +260,62 @@ function validateLoginForm() {
 /* ================================================================
    AUTHENTICATION: Attempt Login
    ================================================================
-   Tries to find a matching user in RegistrationData.
-   
-   Features:
-   - Checks if account is locked due to too many attempts
-   - Validates TRN and password against localStorage data
-   - Tracks failed attempts (max 3)
-   - Redirects to product catalog on success
-   - Redirects to locked page after 3 failed attempts
+   Question 1b (ii): Validates the entered TRN and password against
+   data stored in localStorage key 'RegistrationData'.
+
+   Question 1b (iii): Visitor is given 3 attempts. If login is
+   successful, redirect to the product catalog. Otherwise, after
+   3 failed attempts, redirect to account-locked.html.
    ================================================================ */
 function attemptLogin() {
-    // Check if account is already locked
-    if (isAccountLocked()) {
-        loginError.textContent = 'Account locked due to multiple failed attempts. Redirecting to locked page...';
-        loginError.classList.add('show');
-        
-        setTimeout(function() {
-            redirectToLockedPage();
-        }, 1500);
+    // Guard: if already locked before this attempt, redirect immediately
+    if (loginAttempts >= MAX_ATTEMPTS) {
+        window.location.href = 'account-locked.html';
         return;
     }
-    
-    // Get the entered values
-    var trn = trnInput.value.trim();
-    var password = passwordInput.value;
-    
-    // Validate credentials against RegistrationData
-    var credentialsValid = validateCredentials(trn, password);
-    
-    if (credentialsValid) {
-        // SUCCESS: Reset attempts and redirect to catalog
-        resetAttempts();
-        updateAttemptsDisplay();
-        
-        // Get user info for session
-        var user = findUserByTRN(trn);
-        
-        loginSuccess(user);
-    } else {
-        // Failed attempt - increment counter
-        var newAttemptCount = incrementAttempts();
-        updateAttemptsDisplay();
-        
-        var remaining = MAX_ATTEMPTS - newAttemptCount;
-        
-        if (newAttemptCount >= MAX_ATTEMPTS) {
-            // Account now locked
-            loginError.textContent = 'Invalid TRN or password. Three attempts exceeded. Redirecting to account locked page...';
-            loginError.classList.add('show');
-            
-            setTimeout(function() {
-                redirectToLockedPage();
-            }, 2000);
-        } else {
-            // Show remaining attempts
-            loginError.textContent = 'Invalid TRN or password. You have ' + remaining + ' attempt(s) remaining.';
-            loginError.classList.add('show');
-            showToast('Invalid credentials', true);
-            
-            // Add shake animation to the form (visual feedback)
-            loginForm.style.animation = 'shake 0.5s ease';
-            
-            setTimeout(function() {
-                loginForm.style.animation = '';
-            }, 500);
+
+    var enteredTRN  = trnInput.value.trim();
+    var enteredPass = passwordInput.value;
+
+    // Question 1b (ii): Load users array from RegistrationData key
+    var registeredUsers = getRegistrationData();
+
+    var userFound   = false;
+    var matchedUser = null;
+
+    // FOR LOOP: Check each registered user for matching TRN + password
+    for (var i = 0; i < registeredUsers.length; i++) {
+        if (registeredUsers[i].trn === enteredTRN &&
+            registeredUsers[i].password === enteredPass) {
+            userFound   = true;
+            matchedUser = registeredUsers[i];
+            break;
         }
-        
-        // Clear password field for security
-        passwordInput.value = '';
+    }
+
+    if (userFound) {
+        // SUCCESS: reset attempt counter and redirect to products
+        sessionStorage.removeItem('loginAttempts');
+        loginAttempts = 0;
+        updateAttemptsDisplay();
+        loginSuccess(matchedUser);
+    } else {
+        // FAILED: increment counter
+        loginAttempts++;
+        sessionStorage.setItem('loginAttempts', loginAttempts);
+        updateAttemptsDisplay();
+
+        var attemptsLeft = MAX_ATTEMPTS - loginAttempts;
+
+        // Question 1b (iii): After 3 failed attempts redirect to locked page
+        if (loginAttempts >= MAX_ATTEMPTS) {
+            showToast('Account locked. Too many failed attempts.', 'error');
+            setTimeout(function() {
+                window.location.href = 'account-locked.html';
+            }, 1500);
+        } else {
+            loginFailed(attemptsLeft);
+        }
     }
 }
 
@@ -571,54 +323,62 @@ function attemptLogin() {
 /* ================================================================
    LOGIN SUCCESS HANDLER
    ================================================================
-   Called when user successfully logs in.
-   
-   What it does:
    1. Creates a session object with user info
-   2. Stores session in localStorage using JSON.stringify()
-   3. Shows success message
-   4. Redirects to product catalog page
+   2. Stores session in localStorage (key: seoulBiteSession)
+      using JSON.stringify() to convert the object to a string
+   3. Shows success toast message
+   4. Redirects to products.html (the product catalogue)
    ================================================================ */
 function loginSuccess(user) {
-    // Create session object with user information
+    // Build session object using firstName/lastName stored by register.js
     var session = {
-        trn: user.trn,
-        email: user.email || '',
-        fullName: user.fullName || user.name || 'User',
+        trn:        user.trn,
+        firstName:  user.firstName,
+        lastName:   user.lastName,
+        email:      user.email,
         loggedInAt: new Date().toISOString()
     };
-    
-    // Use JSON.stringify() to store session in localStorage
+
+    // JSON.stringify() converts the object to a string for localStorage
     localStorage.setItem('seoulBiteSession', JSON.stringify(session));
-    
-    // Show success message using toast
-    showToast('Login successful! Redirecting to catalog...', false);
-    
-    // Redirect to product catalog page after 1.5 seconds
+
+    showToast('Login successful! Redirecting...', 'success');
+
+    // Redirect to products.html - the product catalogue
     setTimeout(function() {
-        redirectToCatalog();
+        window.location.href = 'products.html';
     }, 1500);
+}
+
+
+/* ================================================================
+   LOGIN FAILED HANDLER
+   ================================================================
+   Shows error message with remaining attempts and shakes the form.
+   ================================================================ */
+function loginFailed(attemptsLeft) {
+    var message = 'Invalid TRN or password. ';
+    message    += attemptsLeft + ' attempt' + (attemptsLeft === 1 ? '' : 's') + ' remaining.';
+
+    loginError.textContent = message;
+    loginError.classList.add('show');
+
+    // Shake animation as visual feedback
+    loginForm.style.animation = 'shake 0.5s ease';
+    setTimeout(function() {
+        loginForm.style.animation = '';
+    }, 500);
 }
 
 
 /* ================================================================
    SHOW ERROR FUNCTION
    ================================================================
-   Displays an error message for a specific input field.
-   
-   DOM MANIPULATION:
-   - Adds 'input-error' class to highlight the field in red
-   - Sets error message text
-   - Adds 'show' class to make error visible
+   DOM MANIPULATION: Highlights a field and shows an error message.
    ================================================================ */
 function showError(input, errorElement, message) {
-    // Add red border to input field
     input.classList.add('input-error');
-    
-    // Set the error message text
     errorElement.textContent = message;
-    
-    // Make the error message visible
     errorElement.classList.add('show');
 }
 
@@ -626,16 +386,11 @@ function showError(input, errorElement, message) {
 /* ================================================================
    HIDE ERROR FUNCTION
    ================================================================
-   Hides the error message for a specific input field.
+   DOM MANIPULATION: Removes error highlight and hides message.
    ================================================================ */
 function hideError(input, errorElement) {
-    // Remove red border from input
     input.classList.remove('input-error');
-    
-    // Clear the error message
     errorElement.textContent = '';
-    
-    // Hide the error element
     errorElement.classList.remove('show');
 }
 
@@ -643,144 +398,40 @@ function hideError(input, errorElement) {
 /* ================================================================
    CLEAR ALL ERRORS FUNCTION
    ================================================================
-   Clears all error messages on the form.
-   Called before re-validating the form.
+   Clears all error messages. Called before re-validating.
    ================================================================ */
 function clearErrors() {
-    hideError(trnInput, trnError);
+    hideError(trnInput,      trnError);
     hideError(passwordInput, passwordError);
-    
-    if (loginError) {
-        loginError.textContent = '';
-        loginError.classList.remove('show');
-    }
-}
-
-
-/* ================================================================
-   EVENT HANDLING: Form Submit Event
-   ================================================================
-   addEventListener() attaches a function to run when an event occurs.
-   
-   The 'submit' event fires when user clicks the Login button
-   or presses Enter in a form field.
-   
-   e.preventDefault() stops the form from submitting normally
-   (which would reload the page).
-   ================================================================ */
-if (loginForm) {
-    loginForm.addEventListener('submit', function(e) {
-        // Prevent the browser's default form submission behavior
-        e.preventDefault();
-        
-        // Clear any previous error messages
-        clearErrors();
-        
-        // Validate the form - if valid, try to log in
-        if (validateLoginForm()) {
-            attemptLogin();
-        }
-    });
-}
-
-
-/* ================================================================
-   EVENT HANDLING: Blur Events
-   ================================================================
-   The 'blur' event fires when a user leaves an input field
-   (clicks away or tabs to another field).
-   
-   We use this to validate fields as the user fills out the form.
-   ================================================================ */
-
-// When user leaves TRN field, validate it
-if (trnInput) {
-    trnInput.addEventListener('blur', function() {
-        validateTRN();
-    });
-}
-
-// When user leaves password field, validate it
-if (passwordInput) {
-    passwordInput.addEventListener('blur', function() {
-        validatePassword();
-    });
-}
-
-
-/* ================================================================
-   EVENT HANDLING: Focus Events
-   ================================================================
-   The 'focus' event fires when a user clicks into an input field.
-   
-   We use this to clear error messages when user starts typing again.
-   ================================================================ */
-
-// When user clicks into TRN field, clear its error
-if (trnInput) {
-    trnInput.addEventListener('focus', function() {
-        hideError(trnInput, trnError);
-    });
-}
-
-// When user clicks into password field, clear its error
-if (passwordInput) {
-    passwordInput.addEventListener('focus', function() {
-        hideError(passwordInput, passwordError);
-    });
-}
-
-
-/* ================================================================
-   EVENT HANDLING: Cancel Button
-   ================================================================ */
-if (cancelBtn) {
-    cancelBtn.addEventListener('click', function() {
-        onCancel();
-    });
-}
-
-
-/* ================================================================
-   EVENT HANDLING: Reset Password Link
-   ================================================================ */
-if (resetPasswordLink) {
-    resetPasswordLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        handlePasswordReset();
-    });
+    loginError.textContent = '';
+    loginError.classList.remove('show');
 }
 
 
 /* ================================================================
    PAGE LOAD CHECK
    ================================================================
-   EVENT HANDLING: DOMContentLoaded event
-   
-   This event fires when the HTML is fully loaded.
-   We check if user is already logged in and redirect if so.
-   Also updates attempt display.
+   EVENT HANDLING: DOMContentLoaded fires once the HTML is ready.
+   - If user is already logged in, redirect to products page.
+   - If max attempts already exceeded, redirect to locked page.
+   - Update the attempts display.
    ================================================================ */
 window.addEventListener('DOMContentLoaded', function() {
-    // Update attempts display
+    // Update attempts display on page load
     updateAttemptsDisplay();
-    
-    // Check if user is already logged in
+
+    // Redirect if already logged in
     var session = localStorage.getItem('seoulBiteSession');
-    
     if (session) {
-        // User already logged in, redirect to product catalog
-        window.location.href = 'product-catalog.html';
+        window.location.href = 'products.html';
+        return;
     }
-    
-    // Show locked message if account is locked
-    if (isAccountLocked()) {
-        loginError.textContent = 'Account temporarily locked due to multiple failed attempts. Please use "Reset Password" to recover.';
-        loginError.classList.add('show');
+
+    // Redirect if already locked
+    if (loginAttempts >= MAX_ATTEMPTS) {
+        window.location.href = 'account-locked.html';
     }
 });
 
-
-console.log('Login.js loaded successfully - TRN-based authentication with 3-attempt limit');
 
 console.log('Login.js loaded successfully');
