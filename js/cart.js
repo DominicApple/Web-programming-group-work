@@ -433,10 +433,35 @@ function removeItem(itemId) {
 /* ================================================================
    SAVE AND REFRESH CART FUNCTION
    ================================================================
-   Saves cart to localStorage and reloads the display.
+   Question 2e(i)(2): Saves cart to localStorage including product
+   details, taxes, discounts, subtotal and current total cost.
    ================================================================ */
 function saveAndRefreshCart(cart) {
+    // Calculate current totals so they travel with the cart object
+    var subtotal = 0;
+    for (var i = 0; i < cart.length; i++) {
+        subtotal += cart[i].price * cart[i].quantity;
+    }
+    var discount    = subtotal * DISCOUNT_RATE;
+    var afterDiscount = subtotal - discount;
+    var tax         = afterDiscount * TAX_RATE;
+    var deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
+    var total       = afterDiscount + tax + deliveryFee;
+
+    // Build cart object that includes items AND financial summary
+    var cartWithTotals = {
+        items:       cart,
+        subtotal:    subtotal,
+        discount:    discount,
+        tax:         Math.round(tax),
+        deliveryFee: deliveryFee,
+        total:       Math.round(total)
+    };
+
+    // Question 2b / 2e: persist full cart (with totals) to localStorage
     localStorage.setItem('seoulBiteCart', JSON.stringify(cart));
+    localStorage.setItem('seoulBiteCartSummary', JSON.stringify(cartWithTotals));
+
     loadCart();  // Reload the display
 }
 
