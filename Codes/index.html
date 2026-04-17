@@ -28,7 +28,7 @@
         <form id="login-form" novalidate>
             <div class="form-group">
                 <label for="trn">Tax Registration Number (TRN)</label>
-                <input type="text" id="trn" placeholder="Enter your TRN (e.g. 123456789)" required>
+                <input type="text" id="trn" placeholder="000-000-000" required maxlength="11">
                 <div class="error-message" id="trn-error"></div>
             </div>
 
@@ -44,9 +44,12 @@
             </div>
         </form>
 
-        <!-- Reset Password hyperlink -->
+        <!--
+            Question 1b (vi): Reset Password hyperlink - allows user to
+            change their password by matching their TRN on reset-password.html
+        -->
         <div class="reset-link">
-            <a href="#" id="reset-password-link">Forgot or Reset Password?</a>
+            <a href="reset-password.html">Forgot or Reset Password?</a>
         </div>
 
         <!-- Attempts remaining indicator -->
