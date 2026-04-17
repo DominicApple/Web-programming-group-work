@@ -73,6 +73,14 @@
     text-decoration: underline;
 }
 
+/* Tablet */
+@media (max-width: 750px) {
+    .auth-container {
+        max-width: 500px;
+        padding: 30px;
+    }
+}
+
 /* Mobile */
 @media (max-width: 600px) {
     .auth-container { padding: 24px; }
