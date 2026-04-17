@@ -33,6 +33,7 @@ var DISCOUNT_RATE = 0.10;   // 10% discount
 var TAX_RATE = 0.15;         // 15% GCT
 var DELIVERY_FEE = 500;      // J$500 flat delivery fee
 var FREE_DELIVERY_THRESHOLD = 5000; // Free delivery above J$5000 subtotal
+var checkoutSubmitLocked = false; // Prevent duplicate invoice generation on rapid clicks
 
 
 /* ================================================================
@@ -44,12 +45,28 @@ var FREE_DELIVERY_THRESHOLD = 5000; // Free delivery above J$5000 subtotal
    ================================================================ */
 window.addEventListener('DOMContentLoaded', function() {
 
+    // Run checkout logic only on the checkout page.
+    // This prevents redirects if this script is accidentally loaded elsewhere.
+    var checkoutRoot = document.getElementById('main-content');
+    if (!checkoutRoot || !checkoutRoot.classList.contains('checkout-container')) {
+        return;
+    }
+
     // --- LOGIN CHECK ---
     // Get the current session from localStorage
     var sessionData = localStorage.getItem('seoulBiteSession');
+    var parsedSession = null;
+
+    if (sessionData) {
+        try {
+            parsedSession = JSON.parse(sessionData);
+        } catch (e) {
+            parsedSession = null;
+        }
+    }
 
     // IF: No session exists, user is not logged in
-    if (!sessionData) {
+    if (!parsedSession) {
         alert('You must be logged in to checkout. Redirecting to login page.');
         window.location.href = 'index.html';
         return; // Stop function from running further
@@ -72,7 +89,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // --- PRE-FILL SHIPPING FIELDS ---
     // If user data is available in RegistrationData, pre-fill name and phone
-    preFillShippingFromRegistration(JSON.parse(sessionData));
+    preFillShippingFromRegistration(parsedSession);
 
     // --- PAYMENT METHOD EVENT LISTENERS ---
     // Set up listeners to show/hide card fields based on selected payment
@@ -84,9 +101,12 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // --- DONE BUTTON ---
     // Set up the "Continue Shopping" button in the confirmation modal
-    document.getElementById('done-btn').addEventListener('click', function() {
-        window.location.href = 'products.html';
-    });
+    var doneBtn = document.getElementById('done-btn');
+    if (doneBtn) {
+        doneBtn.addEventListener('click', function() {
+            window.location.href = 'products.html';
+        });
+    }
 });
 
 
@@ -299,6 +319,11 @@ function setupCardFormatting() {
    ================================================================ */
 function confirmCheckout() {
 
+    // Ignore repeated clicks while checkout is already being processed.
+    if (checkoutSubmitLocked) {
+        return;
+    }
+
     // STEP 1: Run form validation
     var isValid = validateCheckoutForm();
 
@@ -307,8 +332,25 @@ function confirmCheckout() {
         return;
     }
 
+    checkoutSubmitLocked = true;
+
+    var confirmBtn = document.getElementById('confirm-btn');
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Processing...';
+    }
+
     // STEP 2: If everything is valid, generate the invoice
-    generateInvoice();
+    try {
+        generateInvoice();
+    } catch (error) {
+        checkoutSubmitLocked = false;
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Confirm Order';
+        }
+        alert('Something went wrong while processing checkout. Please try again.');
+    }
 }
 
 
@@ -386,7 +428,13 @@ function validateCheckoutForm() {
     /* ----------------------------------------------------------
        VALIDATE CARD FIELDS (only if card payment is selected)
        ---------------------------------------------------------- */
-    var selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+    var selectedPaymentRadio = document.querySelector('input[name="payment"]:checked');
+    if (!selectedPaymentRadio) {
+        alert('Please select a payment method.');
+        return false;
+    }
+
+    var selectedPayment = selectedPaymentRadio.value;
 
     if (selectedPayment === 'card') {
 
@@ -453,6 +501,9 @@ function validateCheckoutForm() {
    Then shows a confirmation modal.
    ================================================================ */
 function generateInvoice() {
+    var selectedPaymentRadio = document.querySelector('input[name="payment"]:checked');
+    var selectedPayment = selectedPaymentRadio ? selectedPaymentRadio.value : 'cod';
+
 
     // --- GET DATA FROM LOCALSTORAGE ---
     var cart      = JSON.parse(localStorage.getItem('seoulBiteCart'))        || [];
@@ -516,7 +567,7 @@ function generateInvoice() {
         total         : totals.total      || 0,
         amountPaid    : shippingDetails.amountPaid,
         changeDue     : shippingDetails.amountPaid - (totals.total || 0),
-        paymentMethod : document.querySelector('input[name="payment"]:checked').value
+        paymentMethod : selectedPayment
     };
 
     // ============================================================
